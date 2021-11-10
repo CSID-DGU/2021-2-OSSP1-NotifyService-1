@@ -28,55 +28,74 @@ totalPage = 2
 # 엑셀 행 수
 excel_row = 1
 
-worksheet.set_column('A:A', 40)  # A 열의 너비를 40으로 설정
-worksheet.set_column('B:B', 80)  # B 열의 너비를 12로 설정
+worksheet.set_column('A:A', 20)  # A 열의 너비를 40으로 설정
+worksheet.set_column('B:B', 40)  # B 열의 너비를 12로 설정
+worksheet.set_column('C:C', 80)  # B 열의 너비를 12로 설정
 
-worksheet.write(0, 0, '타이틀')
-worksheet.write(0, 1, '링크')
+worksheet.write(0, 0, '카테고리')
+worksheet.write(0, 1, '타이틀')
+worksheet.write(0, 2, '링크')
 
-while curPage <= totalPage:
-    url = f'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=11533472&id=kr_010808000000&spage={curPage}'
-    html = urllib.request.urlopen(url).read()
-    soup = BeautifulSoup(html, 'html.parser')
+url_list = [
+    'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3646&id=kr_010802000000' #일반
+    , 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3638&id=kr_010801000000' #학사
+    , 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3654&id=kr_010803000000' #입시
+    , 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3662&id=kr_010804000000' #장학
+    , 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=9457435&id=kr_010807000000' #국제
+    , 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=11533472&id=kr_010808000000' #학술/행사
+]
 
-    # 게시글 리스트 선택
-    board_list = soup.select('#board_list > tbody > tr')
-    category = soup.select_one('p.location > strong').text.strip()
-    print(category)
-    # 페이지 번호 출력
-    print('----- Current Page : {}'.format(curPage), '------')
+for url in url_list:
+    curPage = 1
+    while curPage <= totalPage:
+        time.sleep(3)
+        # 페이지 번호 출력
+        print('----- Current Page : {}'.format(curPage), '------')
+        print('original url : '+url)
 
-    for board in board_list:
-        # 게시글 제목, 링크
+        url_change = url + f'&spage={curPage}'
+        print('changed url : '+url_change)
 
-        name = board.select_one('td.title > a').text.strip()
-        link = 'https://www.dongguk.edu/mbs/kr/jsp/board/'+board.select_one('td.title > a').get('href')
+        time.sleep(3)
 
-        print(name+link)
+        html = urllib.request.urlopen(url_change).read()
+        soup = BeautifulSoup(html, 'html.parser')
 
-        # 엑셀 저장(텍스트)
-        worksheet.write(excel_row, 0, category)
-        worksheet.write(excel_row, 1, name)
-        worksheet.write(excel_row, 2, link)
+        # 게시글 리스트 선택
+        board_list = soup.select('#board_list > tbody > tr')
+        category = soup.select_one('p.location > strong').text.strip()
 
-        # 엑셀 행 증가
-        excel_row += 1
+        for board in board_list:
+            # 게시글 제목, 링크
+            name = board.select_one('td.title > a').text.strip()
+            link = 'https://www.dongguk.edu/mbs/kr/jsp/board/'+board.select_one('td.title > a').get('href')
 
-    print()
+            print(name+link)
 
-    # 페이지 수 증가
-    curPage += 1
+            # 엑셀 저장(텍스트)
+            worksheet.write(excel_row, 0, category)
+            worksheet.write(excel_row, 1, name)
+            worksheet.write(excel_row, 2, link)
 
-    if curPage > totalPage:
-        print('Crawling succeed!')
-        break
+            # 엑셀 행 증가
+            excel_row += 1
 
-    # BeautifulSoup 인스턴스 삭제
-    del soup
+        print()
 
-    # 3초간 대기
-    time.sleep(3)
+        # 페이지 수 증가
+        curPage += 1
 
+        if curPage > totalPage:
+            print('Crawling succeed!')
+            break
+
+
+        # 3초간 대기
+        time.sleep(3)
+
+
+# BeautifulSoup 인스턴스 삭제
+del soup
 
 # 엑셀 파일 닫기
 workbook.close()  # 저장
