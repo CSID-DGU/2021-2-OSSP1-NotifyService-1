@@ -11,7 +11,8 @@ options.add_argument('headless');  # headless는 화면이나 페이지 이동�
 
 # Excel 처리 선언
 savePath = "c:/Users/USER/Documents/"
-workbook = xlsxwriter.Workbook(savePath + 'crawling_result.xlsx')
+name = time.strftime('%H%M%S')+'result.xlsx'
+workbook = xlsxwriter.Workbook(savePath + name)
 
 # 워크 시트
 worksheet = workbook.add_worksheet()
@@ -39,16 +40,14 @@ worksheet.write(0, 2, '제목')
 worksheet.write(0, 3, '링크')
 
 url_list = [
-    'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3646&id=kr_010802000000'  # 일반
-    , 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3638&id=kr_010801000000'  # 학사
-    , 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3654&id=kr_010803000000'  # 입시
-    , 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3662&id=kr_010804000000'  # 장학
-    , 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=9457435&id=kr_010807000000'  # 국제
-    , 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=11533472&id=kr_010808000000'  # 학술/행사
+    ['https://kor-cre.dongguk.edu/?page_id=282', '국어국문']
+    , ['https://english.dongguk.edu/?page_id=250', '영문']
+    , ['https://english.dongguk.edu/?page_id=259', '영문대학원']
 ]
 
-for url in url_list:
+for list in url_list:
 
+    url = list[0]
     # url_list의 loop를 돌면서 url이 변경될 때 마다 현재 페이지를 1로 설정
     curPage = 1
 
@@ -59,7 +58,7 @@ for url in url_list:
         print('original url : ' + url)
 
         # 변경된 url에 페이지 번호를 붙임
-        url_change = url + f'&spage={curPage}'
+        url_change = url + f'&pageid={curPage}'
         print('changed url : ' + url_change)
         print('-------------------------------------------------')
 
@@ -71,8 +70,8 @@ for url in url_list:
         soup = BeautifulSoup(html, 'html.parser')
 
         # 게시글 리스트 선택
-        board_list = soup.select('#board_list > tbody > tr')
-        category = soup.select_one('p.location > strong').text.strip()
+        board_list = soup.select('#kboard-default-list > div.kboard-list > table > tbody > tr')
+        category = list[1]
 
         for board in board_list:
 
@@ -80,14 +79,14 @@ for url in url_list:
             # 고정된 공지는 td > img 형태인데, 이를 text로 변환하면 공백이 됨
             notice = board.select_one('td').text.strip()
 
-            if notice == "":  # 공백인 경우 고정공지이므로 크롤링 하지 않음
+            if notice == "공지사항":  # 공백인 경우 고정공지이므로 크롤링 하지 않음
                 continue
             else:  # 값이 있는 경우 일반공지로, 크롤링 진행
                 # 게시글 제목, 링크
-                name = board.select_one('td.title > a').text.strip()
-                link = 'https://www.dongguk.edu/mbs/kr/jsp/board/' + board.select_one('td.title > a').get('href')
+                name = board.select_one('td.kboard-list-title > div > a').text.strip()
+                link = url + board.select_one('td.kboard-list-title > div > a').get('href')
 
-                print('[' + notice + ']' + name + ' >> ' + link)
+                print('[' + notice + '][' + category + ']' + name + ' >> ' + link)
 
                 # 엑셀 저장(텍스트)
                 worksheet.write(excel_row, 0, category)  # 분류
