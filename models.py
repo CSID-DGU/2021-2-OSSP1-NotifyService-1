@@ -6,7 +6,7 @@ class User(db.Model):
     __tablename__ = 'USER'
     __table_args__ = {'mysql_collate': 'utf8_general_ci'}
     
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(100), primary_key=True)
     college = db.Column(db.String(5))
     department = db.Column(db.String(30))
     
@@ -15,9 +15,14 @@ class User(db.Model):
         self.college = college
         self.department = department
     
-    def __repr__(self):
-        return "User('{self.id}', '{self.college}', '{self.department}')"
+class Keywords(db.Model):
+    __tablename__ = 'KEYWORDS'
+    __table_args__ = {'mysql_collate': 'utf8_general_ci'}
     
-    def as_dict(self):
-        return {x.name: getattr(self, x.name) for x in self.__table__.columns}
+    id = db.Column(db.String(100), primary_key=True)
+    key = db.Column(db.String(10), primary_key=True)
+    
+    def __init__(self, id, key):
+        self.id = id
+        self.key = key
     
