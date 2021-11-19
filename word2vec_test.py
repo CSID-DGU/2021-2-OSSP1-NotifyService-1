@@ -21,7 +21,14 @@ for sentence in tqdm.tqdm(train_data['공지내용']):
     stopwords_removed_sentence = [word for word in tokenized_sentence if not word in stopwords] # 불용어 제거
     tokenized_data.append(stopwords_removed_sentence)
 
-print(tokenized_data)
+#print(tokenized_data)
 
 model = Word2Vec(sentences = tokenized_data)
 print(model.wv.vectors.shape)
+
+word_vectors=model.wv
+vocabs=word_vectors.vocab.keys()
+word_vectors_list=[word_vectors[v] for v in vocabs]
+print(vocabs)
+print(model.wv.most_similar("사업"))
+print(model.wv.most_similar("졸업"))
