@@ -5,23 +5,23 @@ from gensim.models.word2vec import Word2Vec
 from konlpy.tag import Okt
 import tqdm
 
-train_data = pd.read_table('C:/Users/kaun1/test.txt')#자신의 파일 이름으로 바꿀것
+train_data = pd.read_excel('203820result.xlsx')#자신의 파일 이름으로 바꿀것
 
 print(train_data.isnull().values.any())
 
-train_data['공지내용'] = train_data['공지내용'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")
+train_data['제목'] = train_data['제목'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")
 
 stopwords = ['시리즈','안내','참가자','모집','과정','을','활용','프로그램','년','및','의','가','이','은','들','는','좀','잘','걍','과','도','를','으로','자','에','와','한','하다']
 
 okt = Okt()
 
 tokenized_data = []
-for sentence in tqdm.tqdm(train_data['공지내용']):
+for sentence in tqdm.tqdm(train_data['제목']):
     tokenized_sentence = okt.morphs(sentence, stem=True) # 토큰화
     stopwords_removed_sentence = [word for word in tokenized_sentence if not word in stopwords] # 불용어 제거
     tokenized_data.append(stopwords_removed_sentence)
 
-#print(tokenized_data)
+print(tokenized_data)
 
 model = Word2Vec(sentences = tokenized_data)
 print(model.wv.vectors.shape)
