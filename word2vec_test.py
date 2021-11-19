@@ -29,6 +29,7 @@ print(model.wv.vectors.shape)
 word_vectors=model.wv
 vocabs=word_vectors.vocab.keys()
 word_vectors_list=[word_vectors[v] for v in vocabs]
+
 print(vocabs)
 print(model.wv.most_similar("사업"))
-print(model.wv.most_similar("졸업"))
+
