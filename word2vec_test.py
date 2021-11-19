@@ -5,7 +5,7 @@ from gensim.models.word2vec import Word2Vec
 from konlpy.tag import Okt
 import tqdm
 
-train_data = pd.read_table('C:/Users/kaun1/test.txt')
+train_data = pd.read_table('C:/Users/kaun1/test.txt')#자신의 파일 이름으로 바꿀것
 
 print(train_data.isnull().values.any())
 
