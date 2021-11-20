@@ -9,8 +9,6 @@ import tqdm
 train_data = pd.read_excel('203820result.xlsx')#엑셀 불러옴
 file = train_data.values.tolist() # 리스트로 정리
 
-# print(train_data.isnull().values.any())
-
 train_data['제목']= train_data['제목'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")#데이터 표현 정규화 -> 특수문자 제거
 
 # 불용어 처리
@@ -18,8 +16,6 @@ stop_words= []
 with open('stopword.txt', encoding='utf-8') as f:
     for i in f:
         stop_words.append(i.strip())
-# stopwords = ['시리즈','안내','참가자','모집','과정','을','활용','프로그램','년','및','의','가','이','은','들','는','좀','잘','걍','과','도','를','으로','자','에','와','한','하다']
-
 
 okt = Okt()
 
