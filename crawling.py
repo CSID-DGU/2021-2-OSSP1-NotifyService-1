@@ -40,13 +40,10 @@ worksheet.write(0, 2, '제목')
 worksheet.write(0, 3, '링크')
 
 url_list = [
-    ['https://comm.dongguk.edu/gnuboard4/bbs/board.php?bo_table=2_5', '사회과학대학 미디어커뮤니케이션학과']
-    , ['https://comm.dongguk.edu/gnuboard4/bbs/board.php?bo_table=2_5_1', '사회과학대학 미디어커뮤니케이션학과']
-    , ['https://comm.dongguk.edu/gnuboard4/bbs/board.php?bo_table=2_5_1', '사회과학대학 미디어커뮤니케이션학과']
-
+    ['http://www.donggukfoodindus-edu.com/bbs/board.php?bo_table=table38', '사회과학대학 식품산업관리학과']
+    , ['http://www.donggukfoodindus-edu.com/bbs/board.php?bo_table=table39', '사회과학대학 식품산업관리학과']
+    , ['http://www.donggukfoodindus-edu.com/bbs/board.php?bo_table=table40', '사회과학대학 식품산업관리학과']
 ]
-
-site_per = 0
 
 for list in url_list:
 
@@ -55,8 +52,9 @@ for list in url_list:
 
     # url_list의 loop를 돌면서 url이 변경될 때 마다 현재 페이지를 1로 설정
     curPage = 1
-    site_per = 0
+
     while curPage <= totalPage:
+
         # 페이지 번호 출력
         print('\n----- Current Page : {}'.format(curPage), '------')
         print('original url : ' + url)
@@ -74,46 +72,37 @@ for list in url_list:
         soup = BeautifulSoup(html, 'html.parser')
 
         # 게시글 리스트 선택
-        board_list = soup.select('.board_list > tr')
-
-
+        board_list = soup.select('#sh_list_tbl > table > tbody > tr')
         # 카테고리 정보는 크롤링하지 않고 2차원 배열에 저장한 값을 읽음.
         category = list[1]
 
         for board in board_list:
-            notice = board.select_one('.num')
+            # 게시글이 고정된 공지사항인 경우 크롤링하지 않음
+            # 고정된 공지는 td > img 형태인데, 이를 text로 변환하면 공백이 됨
+            notice = board.select_one('.num').text.strip()
 
-            if notice is None:  # 공백인 경우 고정공지이므로 크롤링 하지 않음
+            if notice == "":  # 공백인 경우 고정공지이므로 크롤링 하지 않음
                 continue
             else:  # 값이 있는 경우 일반공지로, 크롤링 진행
-                notice = notice.text.strip()
-                if notice == '공지':
-                    continue
-                else:
-                    # 게시글 제목, 링크
-                    name = board.select_one('td.subject > a').text.strip()
-                    link = url_change + board.select_one('td.subject > a').get('href')
+                # 게시글 제목, 링크
+                name = board.select_one('.subject > div > a').text.strip()
+                link = board.select_one('.subject > div > a').get('href')
 
-                    print('[' + notice + ']' + name + ' >> ' + link)
+                print('[' + notice + ']' + name + ' >> ' + link)
 
-                    # 엑셀 저장(텍스트)
-                    worksheet.write(excel_row, 0, category)  # 분류
-                    worksheet.write(excel_row, 1, notice)  # 글번호
-                    worksheet.write(excel_row, 2, name)  # 제목
-                    worksheet.write(excel_row, 3, link)  # 링크
+                # 엑셀 저장(텍스트)
+                worksheet.write(excel_row, 0, category)  # 분류
+                worksheet.write(excel_row, 1, notice)  # 글번호
+                worksheet.write(excel_row, 2, name)  # 제목
+                worksheet.write(excel_row, 3, link)  # 링크
 
-                    # 엑셀 행 증가
-                    excel_row += 1
-                    site_per += 1
+                # 엑셀 행 증가
+                excel_row += 1
 
         # 현재 페이지의 게시글을 크롤링하는 for loop 종료
 
         # 페이지 수 증가
         curPage += 1
-
-        if site_per < 15:
-            print('------------------ 게시글 개수가 적어서 현재 페이지에서 크롤링 종료 ------------------')
-            break
 
         if curPage > totalPage:
             print('------------------ ' + category + ' 크롤링 종료 ------------------')
@@ -122,7 +111,6 @@ for list in url_list:
         # 3초간 대기
         time.sleep(3)
 
-print("~~~ 끄읕 !!!")
 # BeautifulSoup 인스턴스 삭제
 del soup
 
