@@ -10,7 +10,7 @@ options = Options()
 options.add_argument('headless');  # headless는 화면이나 페이지 이동을 표시하지 않고 동작하는 모드
 
 # Excel 처리 선언
-savePath = "c:/Users/USER/Documents/"
+savePath = "c:/Users/jiwon/Documents/"
 name = time.strftime('%H%M%S')+'result.xlsx'
 workbook = xlsxwriter.Workbook(savePath + name)
 
@@ -40,27 +40,47 @@ worksheet.write(0, 2, '제목')
 worksheet.write(0, 3, '링크')
 
 url_list = [
-    'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3646&id=kr_010802000000'  # 일반
-    , 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3638&id=kr_010801000000'  # 학사
-    , 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3654&id=kr_010803000000'  # 입시
-    , 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3662&id=kr_010804000000'  # 장학
-    , 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=9457435&id=kr_010807000000'  # 국제
-    , 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=11533472&id=kr_010808000000'  # 학술/행사
+    ['http://bs.dongguk.edu/bbs/board.php?bo_table=bs5_1', '불교학부']
+    , ['http://bs.dongguk.edu/bbs/board.php?bo_table=bs5_3', '불교학부']
+    , ['http://liberal.dongguk.edu/bbs/board.php?bo_table=lib4_1', '문과대학']
+    , ['http://liberal.dongguk.edu/bbs/board.php?bo_table=lib4_3', '문과대학']
+    , ['http://science.dongguk.edu/bbs/board.php?bo_table=sci3_1', '이과대학']
+    , ['http://science.dongguk.edu/bbs/board.php?bo_table=sci3_2', '이과대학']
+    , ['http://law.dongguk.edu/bbs/board.php?bo_table=law2_1', '법과대학']
+    , ['http://law.dongguk.edu/bbs/board.php?bo_table=law2_3', '법과대학']
+    , ['http://law.dongguk.edu/bbs/board.php?bo_table=law2_7', '법과대학']
+    , ['http://social.dongguk.edu/bbs/board.php?bo_table=social3_1', '사회과학대학']
+    , ['http://sba.dongguk.edu/bbs/board.php?bo_table=sba4_1', '경영대학']
+    , ['http://life.dongguk.edu/bbs/board.php?bo_table=life4_1', '바이오시스템대학']
+    , ['http://life.dongguk.edu/bbs/board.php?bo_table=life4_5', '바이오시스템대학']
+    , ['http://life.dongguk.edu/bbs/board.php?bo_table=life4_6', '바이오시스템대학']
+    , ['http://life.dongguk.edu/bbs/board.php?bo_table=life4_7', '바이오시스템대학']
+    , ['http://edu.dongguk.edu/bbs/board.php?bo_table=edu3_1', '사범대학 ']
+    , ['http://historyedu.dongguk.edu/bbs/board.php?bo_table=history6_1', '사범대학 역사교육과']
+    , ['http://historyedu.dongguk.edu/bbs/board.php?bo_table=history6_1_2', '사범대학 역사교육과']
+    , ['http://historyedu.dongguk.edu/bbs/board.php?bo_table=history6_1_3', '사범대학 역사교육과']
+    , ['http://art.dongguk.edu/bbs/board.php?bo_table=art4_1', '예술대학']
+    , ['http://pharm.dongguk.edu/bbs/board.php?bo_table=pharm5_7', '약학대학']
+    , ['http://pharm.dongguk.edu/bbs/board.php?bo_table=pharm5_1', '약학대학']
 ]
 
-for url in url_list:
+site_per = 0
+
+for list in url_list:
+
+    # url_list가 2차원 배열이므로, 공지사항 링크를 변수 url에 저장
+    url = list[0]
 
     # url_list의 loop를 돌면서 url이 변경될 때 마다 현재 페이지를 1로 설정
     curPage = 1
-
+    site_per = 0
     while curPage <= totalPage:
-
         # 페이지 번호 출력
         print('\n----- Current Page : {}'.format(curPage), '------')
         print('original url : ' + url)
 
         # 변경된 url에 페이지 번호를 붙임
-        url_change = url + f'&spage={curPage}'
+        url_change = url + f'&page={curPage}'
         print('changed url : ' + url_change)
         print('-------------------------------------------------')
 
@@ -72,21 +92,23 @@ for url in url_list:
         soup = BeautifulSoup(html, 'html.parser')
 
         # 게시글 리스트 선택
-        board_list = soup.select('#board_list > tbody > tr')
-        category = soup.select_one('p.location > strong').text.strip()
+        board_list = soup.select('#s_right > div > table > tr > td > form > table > tr')
+        # 카테고리 정보는 크롤링하지 않고 2차원 배열에 저장한 값을 읽음.
+        category = list[1]
+        #print(board_list)
 
         for board in board_list:
-
             # 게시글이 고정된 공지사항인 경우 크롤링하지 않음
             # 고정된 공지는 td > img 형태인데, 이를 text로 변환하면 공백이 됨
             notice = board.select_one('td').text.strip()
+            #notice = "공지"
 
             if notice == "":  # 공백인 경우 고정공지이므로 크롤링 하지 않음
                 continue
             else:  # 값이 있는 경우 일반공지로, 크롤링 진행
                 # 게시글 제목, 링크
-                name = board.select_one('td.title > a').text.strip()
-                link = 'https://www.dongguk.edu/mbs/kr/jsp/board/' + board.select_one('td.title > a').get('href')
+                name = board.select_one('td > a').text.strip()
+                link = url_change + board.select_one('td > a').get('href')
 
                 print('[' + notice + ']' + name + ' >> ' + link)
 
@@ -98,11 +120,16 @@ for url in url_list:
 
                 # 엑셀 행 증가
                 excel_row += 1
+                site_per += 1
 
         # 현재 페이지의 게시글을 크롤링하는 for loop 종료
 
         # 페이지 수 증가
         curPage += 1
+
+        if site_per < 15:
+            print('------------------ 게시글 개수가 적어서 현재 페이지에서 크롤링 종료 ------------------')
+            break
 
         if curPage > totalPage:
             print('------------------ ' + category + ' 크롤링 종료 ------------------')
@@ -111,6 +138,7 @@ for url in url_list:
         # 3초간 대기
         time.sleep(3)
 
+print("~~~ 끄읕 !!!")
 # BeautifulSoup 인스턴스 삭제
 del soup
 
