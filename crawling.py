@@ -40,7 +40,7 @@ worksheet.write(0, 2, '제목')
 worksheet.write(0, 3, '링크')
 
 url_list = [
-    ['https://fc.dongguk.edu/bbs/data/list.do?menu_idx=12', '미래융합대학']
+    ['https://ai.dongguk.edu/aix6_1', 'AI 융합학부']
 ]
 
 for list in url_list:
@@ -57,7 +57,8 @@ for list in url_list:
         print('original url : ' + url)
 
         # 변경된 url에 페이지 번호를 붙임
-        url_change = url + f'&pageIndex={curPage}'
+        #url_change = url + f'/p{curPage}'
+        url_change = url
         print('changed url : ' + url_change)
         print('-------------------------------------------------')
 
@@ -69,29 +70,23 @@ for list in url_list:
         soup = BeautifulSoup(html, 'html.parser')
 
         # 게시글 리스트 선택
-        board_list = soup.select('#dBody > table > tbody > tr')
+        board_list = soup.select('#fboardlist > div.bo_list > ul > li')
 
         # 카테고리 정보는 크롤링하지 않고 2차원 배열에 저장한 값을 읽음.
         category = list[1]
-        #print(board_list)
 
         for board in board_list:
             # 게시글이 고정된 공지사항인 경우 크롤링하지 않음
             # 고정된 공지는 td > img 형태인데, 이를 text로 변환하면 공백이 됨
-            notice = board.select_one('.latin').text.strip()
+            notice = board.select_one('.mobile_none').text.strip()
 
             if notice == "":  # 공백인 경우 고정공지이므로 크롤링 하지 않음
-                notice = '공지'
-
-            if curPage > 1 and notice == '공지':
                 continue
-            else:
+            else:  # 값이 있는 경우 일반공지로, 크롤링 진행
                 # 게시글 제목, 링크
-                name = board.select_one('.cell_type > a').text.strip()
-                link_origin = board.select_one('.cell_type > a').get('href')
-                link1 = link_origin[20:32]
-                link2 = link_origin[35:47]
-                link = f'https://fc.dongguk.edu/bbs/data/view.do?&pageIndex={curPage}&menu_idx=12&bbs_mst_idx={link1}&data_idx={link2}'
+                name = board.select_one('.bo_tit > a').text.strip()
+                link = board.select_one('.bo_tit > a').get('href')
+
                 print('[' + notice + ']' + name + ' >> ' + link)
 
                 # 엑셀 저장(텍스트)
@@ -108,12 +103,12 @@ for list in url_list:
         # 페이지 수 증가
         curPage += 1
 
-        if curPage > totalPage:
-            print('------------------ ' + category + ' 크롤링 종료 ------------------')
-            break
-
         if excel_row < 5:
             print('------------------ 게시글 개수가 적어서 현재 페이지에서 크롤링 종료 ------------------')
+            break
+
+        if curPage > totalPage:
+            print('------------------ ' + category + ' 크롤링 종료 ------------------')
             break
 
         # 3초간 대기
