@@ -5,13 +5,14 @@ from gensim.models.word2vec import Word2Vec
 from konlpy.tag import Okt
 import tqdm
 
-train_data = pd.read_excel('203820result.xlsx')#자신의 파일 이름으로 바꿀것
+train_data = pd.read_excel('203820result.xlsx', usecols='C')
 
 print(train_data.isnull().values.any())
 
-train_data['제목'] = train_data['제목'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")
+train_data['제목']= train_data['제목'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")
 
 stopwords = ['시리즈','안내','참가자','모집','과정','을','활용','프로그램','년','및','의','가','이','은','들','는','좀','잘','걍','과','도','를','으로','자','에','와','한','하다']
+
 
 okt = Okt()
 
