@@ -40,9 +40,10 @@ worksheet.write(0, 2, '제목')
 worksheet.write(0, 3, '링크')
 
 url_list = [
-    ['http://www.donggukfoodindus-edu.com/bbs/board.php?bo_table=table38', '사회과학대학 식품산업관리학과']
-    , ['http://www.donggukfoodindus-edu.com/bbs/board.php?bo_table=table39', '사회과학대학 식품산업관리학과']
-    , ['http://www.donggukfoodindus-edu.com/bbs/board.php?bo_table=table40', '사회과학대학 식품산업관리학과']
+    ['http://dguadpr.kr/bbs/board.php?bo_table=table31', '사회과학대학 광고홍보학과']
+    , ['http://dguadpr.kr/bbs/board.php?bo_table=table40', '사회과학대학 광고홍보학과']
+    , ['http://justice.dongguk.edu/bbs/board.php?bo_table=justice7_1', '경찰사법대학']
+    , ['https://movie.dongguk.edu/bbs/board.php?bo_table=movie1_3_1', '예술대학 영화영상학과 ']
 ]
 
 for list in url_list:
@@ -72,21 +73,22 @@ for list in url_list:
         soup = BeautifulSoup(html, 'html.parser')
 
         # 게시글 리스트 선택
-        board_list = soup.select('#sh_list_tbl > table > tbody > tr')
+        board_list = soup.select('#fboardlist > div > table > tbody > tr')
+
         # 카테고리 정보는 크롤링하지 않고 2차원 배열에 저장한 값을 읽음.
         category = list[1]
 
         for board in board_list:
             # 게시글이 고정된 공지사항인 경우 크롤링하지 않음
             # 고정된 공지는 td > img 형태인데, 이를 text로 변환하면 공백이 됨
-            notice = board.select_one('.num').text.strip()
+            notice = board.select_one('.td_num').text.strip()
 
             if notice == "":  # 공백인 경우 고정공지이므로 크롤링 하지 않음
                 continue
             else:  # 값이 있는 경우 일반공지로, 크롤링 진행
                 # 게시글 제목, 링크
-                name = board.select_one('.subject > div > a').text.strip()
-                link = board.select_one('.subject > div > a').get('href')
+                name = board.select_one('.td_subject > a').text.strip()
+                link = board.select_one('.td_subject > a').get('href')
 
                 print('[' + notice + ']' + name + ' >> ' + link)
 
@@ -111,6 +113,7 @@ for list in url_list:
         # 3초간 대기
         time.sleep(3)
 
+print("~~~ 끄읕 !!!")
 # BeautifulSoup 인스턴스 삭제
 del soup
 
