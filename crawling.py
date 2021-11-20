@@ -40,7 +40,7 @@ worksheet.write(0, 2, '제목')
 worksheet.write(0, 3, '링크')
 
 url_list = [
-    ['http://mme.dongguk.edu/k3/sub5/sub1.php?tsort=51&msort=62', '공과대학 멀티미디어공학과']
+    ['https://fc.dongguk.edu/bbs/data/list.do?menu_idx=12', '미래융합대학']
 ]
 
 for list in url_list:
@@ -57,7 +57,7 @@ for list in url_list:
         print('original url : ' + url)
 
         # 변경된 url에 페이지 번호를 붙임
-        url_change = url + f'&page={curPage}'
+        url_change = url + f'&pageIndex={curPage}'
         print('changed url : ' + url_change)
         print('-------------------------------------------------')
 
@@ -69,7 +69,7 @@ for list in url_list:
         soup = BeautifulSoup(html, 'html.parser')
 
         # 게시글 리스트 선택
-        board_list = soup.select('#inner_wrap > div.rightW > div.sub_con > div.board_listW > table > tbody > tr')
+        board_list = soup.select('#dBody > table > tbody > tr')
 
         # 카테고리 정보는 크롤링하지 않고 2차원 배열에 저장한 값을 읽음.
         category = list[1]
@@ -78,25 +78,30 @@ for list in url_list:
         for board in board_list:
             # 게시글이 고정된 공지사항인 경우 크롤링하지 않음
             # 고정된 공지는 td > img 형태인데, 이를 text로 변환하면 공백이 됨
-            notice = board.select_one('.w_cell').text.strip()
+            notice = board.select_one('.latin').text.strip()
 
             if notice == "":  # 공백인 경우 고정공지이므로 크롤링 하지 않음
                 notice = '공지'
 
-            # 게시글 제목, 링크
-            name = board.select_one('.subject > a').text.strip()
-            link = url_change + board.select_one('.subject > a').get('href')
+            if curPage > 1 and notice == '공지':
+                continue
+            else:
+                # 게시글 제목, 링크
+                name = board.select_one('.cell_type > a').text.strip()
+                link_origin = board.select_one('.cell_type > a').get('href')
+                link1 = link_origin[20:32]
+                link2 = link_origin[35:47]
+                link = f'https://fc.dongguk.edu/bbs/data/view.do?&pageIndex={curPage}&menu_idx=12&bbs_mst_idx={link1}&data_idx={link2}'
+                print('[' + notice + ']' + name + ' >> ' + link)
 
-            print('[' + notice + ']' + name + ' >> ' + link)
+                # 엑셀 저장(텍스트)
+                worksheet.write(excel_row, 0, category)  # 분류
+                worksheet.write(excel_row, 1, notice)  # 글번호
+                worksheet.write(excel_row, 2, name)  # 제목
+                worksheet.write(excel_row, 3, link)  # 링크
 
-            # 엑셀 저장(텍스트)
-            worksheet.write(excel_row, 0, category)  # 분류
-            worksheet.write(excel_row, 1, notice)  # 글번호
-            worksheet.write(excel_row, 2, name)  # 제목
-            worksheet.write(excel_row, 3, link)  # 링크
-
-            # 엑셀 행 증가
-            excel_row += 1
+                # 엑셀 행 증가
+                excel_row += 1
 
         # 현재 페이지의 게시글을 크롤링하는 for loop 종료
 
