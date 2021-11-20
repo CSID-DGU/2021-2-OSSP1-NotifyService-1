@@ -5,3 +5,5 @@ gunicorn==19.6.0
 Jinja2==2.10
 six==1.9.0
 Werkzeug==0.13
+flask-sqlalchemy
+psycopg2-binary
