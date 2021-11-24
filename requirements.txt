@@ -40,3 +40,8 @@ smart-open==5.2.1
 tqdm==4.62.3
 tweepy==3.10.0
 urllib3==1.26.7
+
+#지원
+bs4==0.0.1
+chromedriver-autoinstaller==0.2.2
+selenium==4.0.0
