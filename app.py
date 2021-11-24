@@ -131,50 +131,50 @@ def crawl():
 
     time.sleep(3)               # 검색 결과가 렌더링 될 때까지 잠시 대기
     curPage = 1                 # 현재 페이지
-    totalPage = 2               # 크롤링할 전체 페이지수
+    totalPage = 1               # 크롤링할 전체 페이지수
     site_per = 0                # 한 페이지의 게시글 체크용
     loop_index = 0              # 미융대 게시글 관련
 
     url_list = [
-        # [0, 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3646&id=kr_010802000000', '일반공지']
-        # , [0, 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3638&id=kr_010801000000', '학사공지']
-        # , [0, 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3654&id=kr_010803000000', '입시공지']
-        # , [0, 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3662&id=kr_010804000000', '장학공지']
-        # , [0, 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=9457435&id=kr_010807000000', '국제공지']
-        # , [0, 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=11533472&id=kr_010808000000', '학술/행사공지']
-        #
-        # , [1, 'http://bs.dongguk.edu/bbs/board.php?bo_table=bs5_1', '불교학부']
-        # , [1, 'http://bs.dongguk.edu/bbs/board.php?bo_table=bs5_3', '불교학부']
-        # , [1, 'http://liberal.dongguk.edu/bbs/board.php?bo_table=lib4_1', '문과대학']
-        # , [1, 'http://liberal.dongguk.edu/bbs/board.php?bo_table=lib4_3', '문과대학']
-        # , [1, 'http://science.dongguk.edu/bbs/board.php?bo_table=sci3_1', '이과대학']
-        # , [1, 'http://science.dongguk.edu/bbs/board.php?bo_table=sci3_2', '이과대학']
-        # , [1, 'http://law.dongguk.edu/bbs/board.php?bo_table=law2_1', '법과대학']
-        # , [1, 'http://law.dongguk.edu/bbs/board.php?bo_table=law2_3', '법과대학']
-        # , [1, 'http://law.dongguk.edu/bbs/board.php?bo_table=law2_7', '법과대학']
-        # , [1, 'http://social.dongguk.edu/bbs/board.php?bo_table=social3_1', '사회과학대학']
-        # , [1, 'http://sba.dongguk.edu/bbs/board.php?bo_table=sba4_1', '경영대학']
-        # , [1, 'http://life.dongguk.edu/bbs/board.php?bo_table=life4_1', '바이오시스템대학']
-        # , [1, 'http://life.dongguk.edu/bbs/board.php?bo_table=life4_5', '바이오시스템대학']
-        # , [1, 'http://life.dongguk.edu/bbs/board.php?bo_table=life4_6', '바이오시스템대학']
-        # , [1, 'http://life.dongguk.edu/bbs/board.php?bo_table=life4_7', '바이오시스템대학']
-        # , [1, 'http://edu.dongguk.edu/bbs/board.php?bo_table=edu3_1', '사범대학 ']
-        # , [1, 'http://historyedu.dongguk.edu/bbs/board.php?bo_table=history6_1', '사범대학 역사교육과']
-        # , [1, 'http://historyedu.dongguk.edu/bbs/board.php?bo_table=history6_1_2', '사범대학 역사교육과']
-        # , [1, 'http://historyedu.dongguk.edu/bbs/board.php?bo_table=history6_1_3', '사범대학 역사교육과']
-        # , [1, 'http://art.dongguk.edu/bbs/board.php?bo_table=art4_1', '예술대학']
-        # , [1, 'http://pharm.dongguk.edu/bbs/board.php?bo_table=pharm5_7', '약학대학']
-        # , [1, 'http://pharm.dongguk.edu/bbs/board.php?bo_table=pharm5_1', '약학대학']
-        #
-        # , [2, 'https://kor-cre.dongguk.edu/?page_id=282', '문과대학 국어국문문예창작학부']
-        # , [2, 'https://english.dongguk.edu/?page_id=250', '문과대학 영어영문학부']
-        # , [2, 'https://english.dongguk.edu/?page_id=259', '문과대학 영어영문학부']
-        # , [2, 'https://dj.dongguk.edu/?page_id=203', '문과대학 일본학과']
-        # , [2, 'https://dj.dongguk.edu/?page_id=225', '문과대학 일본학과']
-        # , [2, 'https://china.dongguk.edu/?page_id=208', '문과대학 중어중문학과']
-        # , [2, 'https://sophia.dongguk.edu/?page_id=230', '문과대학 철학과']
-        # , [2, 'https://history.dongguk.edu/?page_id=505', '문과대학 사학과']
-         [2, 'https://chem.dongguk.edu/?page_id=288', '이과대학 화학과']
+        [0, 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3646&id=kr_010802000000', '일반공지']
+        , [0, 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3638&id=kr_010801000000', '학사공지']
+        , [0, 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3654&id=kr_010803000000', '입시공지']
+        , [0, 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=3662&id=kr_010804000000', '장학공지']
+        , [0, 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=9457435&id=kr_010807000000', '국제공지']
+        , [0, 'https://www.dongguk.edu/mbs/kr/jsp/board/list.jsp?boardId=11533472&id=kr_010808000000', '학술/행사공지']
+
+        , [1, 'http://bs.dongguk.edu/bbs/board.php?bo_table=bs5_1', '불교학부']
+        , [1, 'http://bs.dongguk.edu/bbs/board.php?bo_table=bs5_3', '불교학부']
+        , [1, 'http://liberal.dongguk.edu/bbs/board.php?bo_table=lib4_1', '문과대학']
+        , [1, 'http://liberal.dongguk.edu/bbs/board.php?bo_table=lib4_3', '문과대학']
+        , [1, 'http://science.dongguk.edu/bbs/board.php?bo_table=sci3_1', '이과대학']
+        , [1, 'http://science.dongguk.edu/bbs/board.php?bo_table=sci3_2', '이과대학']
+        , [1, 'http://law.dongguk.edu/bbs/board.php?bo_table=law2_1', '법과대학']
+        , [1, 'http://law.dongguk.edu/bbs/board.php?bo_table=law2_3', '법과대학']
+        , [1, 'http://law.dongguk.edu/bbs/board.php?bo_table=law2_7', '법과대학']
+        , [1, 'http://social.dongguk.edu/bbs/board.php?bo_table=social3_1', '사회과학대학']
+        , [1, 'http://sba.dongguk.edu/bbs/board.php?bo_table=sba4_1', '경영대학']
+        , [1, 'http://life.dongguk.edu/bbs/board.php?bo_table=life4_1', '바이오시스템대학']
+        , [1, 'http://life.dongguk.edu/bbs/board.php?bo_table=life4_5', '바이오시스템대학']
+        , [1, 'http://life.dongguk.edu/bbs/board.php?bo_table=life4_6', '바이오시스템대학']
+        , [1, 'http://life.dongguk.edu/bbs/board.php?bo_table=life4_7', '바이오시스템대학']
+        , [1, 'http://edu.dongguk.edu/bbs/board.php?bo_table=edu3_1', '사범대학 ']
+        , [1, 'http://historyedu.dongguk.edu/bbs/board.php?bo_table=history6_1', '사범대학 역사교육과']
+        , [1, 'http://historyedu.dongguk.edu/bbs/board.php?bo_table=history6_1_2', '사범대학 역사교육과']
+        , [1, 'http://historyedu.dongguk.edu/bbs/board.php?bo_table=history6_1_3', '사범대학 역사교육과']
+        , [1, 'http://art.dongguk.edu/bbs/board.php?bo_table=art4_1', '예술대학']
+        , [1, 'http://pharm.dongguk.edu/bbs/board.php?bo_table=pharm5_7', '약학대학']
+        , [1, 'http://pharm.dongguk.edu/bbs/board.php?bo_table=pharm5_1', '약학대학']
+
+        , [2, 'https://kor-cre.dongguk.edu/?page_id=282', '문과대학 국어국문문예창작학부']
+        , [2, 'https://english.dongguk.edu/?page_id=250', '문과대학 영어영문학부']
+        , [2, 'https://english.dongguk.edu/?page_id=259', '문과대학 영어영문학부']
+        , [2, 'https://dj.dongguk.edu/?page_id=203', '문과대학 일본학과']
+        , [2, 'https://dj.dongguk.edu/?page_id=225', '문과대학 일본학과']
+        , [2, 'https://china.dongguk.edu/?page_id=208', '문과대학 중어중문학과']
+        , [2, 'https://sophia.dongguk.edu/?page_id=230', '문과대학 철학과']
+        , [2, 'https://history.dongguk.edu/?page_id=505', '문과대학 사학과']
+        , [2, 'https://chem.dongguk.edu/?page_id=288', '이과대학 화학과']
         , [2, 'https://stat.dongguk.edu/?page_id=439', '이과대학 통계학과']
         , [2, 'https://stat.dongguk.edu/?page_id=437', '이과대학 통계학과']
         , [2, 'https://math.dongguk.edu/?page_id=260', '이과대학 수학과']
@@ -251,7 +251,7 @@ def crawl():
 
         , [11, 'http://ise.dongguk.edu/bbs/board.php?bo_table=ise6_1', '공과대학 산업시스템공학과']
         , [11, 'http://ise.dongguk.edu/bbs/board.php?bo_table=ise8_7', '공과대학 산업시스템공학과']
-        , [11, 'http://ise.dongguk.edu/bbs/board.php?bo_table=ise8_7', '공과대학 융합에너지신소재공학과']
+        , [2, 'https://me.dongguk.edu/?page_id=218', '공과대학 융합에너지신소재공학과']
     ]
 
     # 사이트마다 페이징을 위한 변수가 다름.
@@ -398,7 +398,7 @@ def crawl():
                         session.commit()
                         print('성공 : [' + category + ']' + name + ' >> ' + link)
                     else:
-                        print('! 실패 ! : [' + category + ']' + name + ' >> ' + link)
+                        print('     실패 : [' + category + ']' + name + ' >> ' + link)
 
                     # 크롤링 한 게시글 개수 증가
                     site_per += 1
