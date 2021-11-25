@@ -20,10 +20,8 @@ Session.configure(bind=engine)
 session = Session()
 train_data=session.query(Crawl.title).all()
 train_data=pd.DataFrame(train_data,columns = ['제목'])
-#print(type(train_data))
-#train_data=re.sub('[^A-Za-z0-9가-힣]', '', train_data)
 train_data['제목']= train_data['제목'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")#데이터 정규표현식 -> 특수문자 제거
-#print(train_data)
+
     # 불용어 처리
 stop_words= []
 with open('stopword.txt', encoding='utf-8') as f:
@@ -38,8 +36,6 @@ for sentence in tqdm.tqdm(train_data['제목']):
     stopwords_removed_sentence = [word for word in tokenized_sentence if not word in stop_words] # 불용어 제거
     tokenized_data.append(stopwords_removed_sentence)
 
-    # print(tokenized_data)
-
 model = Word2Vec(sentences = tokenized_data)# 학습 -> 모든것이 default로 되어있으므로 값 정해야 함 !
     # print(model.wv.vectors.shape)
 
@@ -47,20 +43,13 @@ word_vectors=model.wv
 vocabs=word_vectors.vocab.keys()# 사전
 word_vectors_list=[word_vectors[v] for v in vocabs]
 
-    # print(vocabs)
-similar = model.wv.most_similar("사업")#사업과 가장 유사한 단어 
-print(similar)
+# print(vocabs)
+    
+# similar = model.wv.most_similar("연구")#사업과 가장 유사한 단어 
+# print(similar)
+similar = "장학"
+train_data=session.query(Crawl.link).filter(Crawl.title.like('%'+similar+'%')).all()
+print(train_data)
+
+
 session.close()
-
-
-
-    
-
-
-    
-    # # for elm in similar:
-    # #     for i in range(len(tokenized_data)):
-    # #         for j in tokenized_data[i]:
-    # #             if elm[0] == j:
-    # #                 print(file[i][3])
-    
