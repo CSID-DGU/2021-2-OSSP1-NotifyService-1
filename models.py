@@ -25,4 +25,16 @@ class Keywords(db.Model):
     def __init__(self, id, key):
         self.id = id
         self.key = key
-    
+
+class Crawl(db.Model):
+    __tablename__ = 'CRAWL'
+    __table_args__ = {'mysql_collate': 'utf8_general_ci'}
+
+    category = db.Column(db.String(30))
+    title = db.Column(db.String(200))
+    link = db.Column(db.String(250), primary_key=True)
+
+    def __init__(self, category, title, link):
+        self.category = category
+        self.title = title
+        self.link = link
