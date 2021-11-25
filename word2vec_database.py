@@ -45,11 +45,10 @@ word_vectors_list=[word_vectors[v] for v in vocabs]
 
 # print(vocabs)
     
-# similar = model.wv.most_similar("연구")#사업과 가장 유사한 단어 
-# print(similar)
-similar = "장학"
-train_data=session.query(Crawl.link).filter(Crawl.title.like('%'+similar+'%')).all()
-print(train_data)
+similar = model.wv.most_similar("연구")#사업과 가장 유사한 단어 
+for i in similar:
+    train_data=session.query(Crawl.link).filter(Crawl.title.like('%'+i[0]+'%')).all()
+    print(train_data)
 
 
 session.close()
