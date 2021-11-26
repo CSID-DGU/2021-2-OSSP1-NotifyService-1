@@ -47,7 +47,7 @@ def findSynonym():
     vocabs=word_vectors.vocab.keys()# 사전
     word_vectors_list=[word_vectors[v] for v in vocabs]
     session.close()
-    # return model
+    #return model
     
 def findLink(set, keyword): # 학습결과를 model로 저장함
     session = Session()
@@ -58,5 +58,11 @@ def findLink(set, keyword): # 학습결과를 model로 저장함
         print(train_data)
     session.close()
 
-# findSynonym()
-findLink('dataset.model', '장학')
+def findsimilar(set,keyword):
+    model=Word2Vec.load(set)
+    most_similar=model.wv.most_similar(keyword)
+    return most_similar
+
+#findSynonym()
+#findLink('dataset.model', '장학')
+print(findsimilar('dataset.model','장학'))# 유사도 볼 수 있는 거 !!
