@@ -136,7 +136,7 @@ def crawl():
 
     session = Session()  # DB 세션 생성
     options = Options()  # 크롤링 옵션
-    options.add_argument('headless');  # headless는 화면이나 페이지 이동을 표시하지 않고 동작하는 모드
+    options.add_argument('headless')  # headless는 화면이나 페이지 이동을 표시하지 않고 동작하는 모드
 
     time.sleep(3)  # 검색 결과가 렌더링 될 때까지 잠시 대기
     curPage = 1  # 현재 페이지
@@ -168,7 +168,7 @@ def crawl():
          , [1, 'http://life.dongguk.edu/bbs/board.php?bo_table=life4_5', '바이오시스템대학']
          , [1, 'http://life.dongguk.edu/bbs/board.php?bo_table=life4_6', '바이오시스템대학']
          , [1, 'http://life.dongguk.edu/bbs/board.php?bo_table=life4_7', '바이오시스템대학']
-         , [1, 'http://edu.dongguk.edu/bbs/board.php?bo_table=edu3_1', '사범대학 ']
+         , [1, 'http://edu.dongguk.edu/bbs/board.php?bo_table=edu3_1', '사범대학']
          , [1, 'http://historyedu.dongguk.edu/bbs/board.php?bo_table=history6_1', '사범대학 역사교육과']
          , [1, 'http://historyedu.dongguk.edu/bbs/board.php?bo_table=history6_1_2', '사범대학 역사교육과']
          , [1, 'http://historyedu.dongguk.edu/bbs/board.php?bo_table=history6_1_3', '사범대학 역사교육과']
@@ -403,9 +403,9 @@ def crawl():
                         link = link_list[now_site_type] + board.select_one(crawl_var_list[now_site_type][2]).get('href')
 
                     # DB에 저장
-                    results = session.query(Crawl.link).filter_by(category=category, link=link).all();
+                    results = session.query(Crawl.link).filter_by(category=category, link=link).all()
                     if not results:
-                        session.add(Crawl(category=category, title=name, link=link))
+                        session.add(Crawl(category=category, title=name, link=link, crawl_time=datetime.datetime.now()))
                         session.commit()
                         print('성공 : [' + category + ']' + name + ' >> ' + link)
                     else:
