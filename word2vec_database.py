@@ -61,7 +61,8 @@ def findLink(set, keyword): # 학습결과를 model로 저장함
 def findsimilar(set,keyword):
     model=Word2Vec.load(set)
     most_similar=model.wv.most_similar(keyword)
-    return most_similar
+    print(set+"을 사용한 "+keyword+" 와(과) 관련된 유사도 : ")
+    print(most_similar) 
 
 def findvocab(set):
     model=Word2Vec.load(set)
@@ -73,8 +74,6 @@ def findvocab(set):
 
 #findSynonym()
 #findLink('dataset.model', '장학')
-# print("CBOW방식으로 했을 때 학습 결과 : ")
-# print(findsimilar('CBOW dataset.model','학기'))# 유사도
-# print("Skip-gram 방식으로 했을 때 학습 결과 : ")
-# print(findsimilar('Skip_gram dataset.model','학기'))# 유사도4
-print(findvocab('CBOW dataset.model'))
+findsimilar('CBOW dataset.model','장학')# 유사도
+findsimilar('Skip_gram dataset.model','장학')# 유사도
+#print(findvocab('CBOW dataset.model'))
