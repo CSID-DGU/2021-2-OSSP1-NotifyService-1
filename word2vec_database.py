@@ -38,10 +38,10 @@ def findSynonym():
         tokenized_data.append(stopwords_removed_sentence)
 
     global model
-    model = Word2Vec(sentences = tokenized_data)# 학습 -> 모든것이 default로 되어있으므로 값 정해야 함 !
+    model = Word2Vec(sentences = tokenized_data, sg=1)# 학습 -> 모든것이 default로 되어있으므로 값 정해야 함 !
         # print(model.wv.vectors.shape)
     # 모델 저장
-    model.save('dataset.model')
+    model.save('Skip_gram dataset.model')
 
     word_vectors=model.wv
     vocabs=word_vectors.vocab.keys()# 사전
@@ -65,4 +65,7 @@ def findsimilar(set,keyword):
 
 #findSynonym()
 #findLink('dataset.model', '장학')
-print(findsimilar('dataset.model','장학'))# 유사도 볼 수 있는 거 !!
+print("CBOW방식으로 했을 때 학습 결과 : ")
+print(findsimilar('CBOW dataset.model','학기'))# 유사도
+print("Skip-gram 방식으로 했을 때 학습 결과 : ")
+print(findsimilar('Skip_gram dataset.model','학기'))# 유사도
