@@ -63,9 +63,18 @@ def findsimilar(set,keyword):
     most_similar=model.wv.most_similar(keyword)
     return most_similar
 
+def findvocab(set):
+    model=Word2Vec.load(set)
+    
+    word_vectors=model.wv
+    vocabs=word_vectors.vocab.keys()# 사전
+
+    return vocabs   
+
 #findSynonym()
 #findLink('dataset.model', '장학')
-print("CBOW방식으로 했을 때 학습 결과 : ")
-print(findsimilar('CBOW dataset.model','학기'))# 유사도
-print("Skip-gram 방식으로 했을 때 학습 결과 : ")
-print(findsimilar('Skip_gram dataset.model','학기'))# 유사도
+# print("CBOW방식으로 했을 때 학습 결과 : ")
+# print(findsimilar('CBOW dataset.model','학기'))# 유사도
+# print("Skip-gram 방식으로 했을 때 학습 결과 : ")
+# print(findsimilar('Skip_gram dataset.model','학기'))# 유사도4
+print(findvocab('CBOW dataset.model'))
