@@ -53,6 +53,8 @@ def findLink(set, keyword): # 학습결과를 model로 저장함
     session = Session()
     model = Word2Vec.load(set)
     similar = model.wv.most_similar(keyword)#사업과 가장 유사한 단어 
+    similar.append((keyword, 1))
+    print(similar)
     for i in similar:
         train_data=session.query(Crawl.link).filter(Crawl.title.like('%'+i[0]+'%' or '%'+keyword+'%')).all()
         print(train_data)
@@ -60,3 +62,6 @@ def findLink(set, keyword): # 학습결과를 model로 저장함
 
 # findSynonym()
 findLink('dataset.model', '장학')
+
+# 몇 개 새로 올라오고
+# [키워드 알려줘 !] -> 새로 올라온 것 중에 알려줌
