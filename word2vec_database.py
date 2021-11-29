@@ -9,7 +9,8 @@ import pandas as pd
 import re
 from nltk.tokenize import word_tokenize, sent_tokenize
 from gensim.models.word2vec import Word2Vec
-from konlpy.tag import Okt
+# from konlpy.tag import Okt
+from konlpy.tag import Kkma
 import tqdm
 
 
@@ -29,25 +30,27 @@ def findSynonym():
         for i in f:
             stop_words.append(i.strip())
 
-    okt = Okt()
+    # okt = Okt()
+    kkma = Kkma()
+
 
     tokenized_data = []
     for sentence in tqdm.tqdm(train_data['제목']):
-        tokenized_sentence = okt.nouns(sentence) # 토큰화 -> noun으로 하는 건 어떰? --> 형태소 말고 명사로 단위로 쪼갬
+        tokenized_sentence = kkma.nouns(sentence) # 토큰화 -> noun으로 하는 건 어떰? --> 형태소 말고 명사로 단위로 쪼갬
         stopwords_removed_sentence = [word for word in tokenized_sentence if not word in stop_words] # 불용어 제거
         tokenized_data.append(stopwords_removed_sentence)
 
     global model
-    model = Word2Vec(sentences = tokenized_data)# 학습 -> 모든것이 default로 되어있으므로 값 정해야 함 !
+    model = Word2Vec(sentences = tokenized_data, sg=1)# 학습 -> 모든것이 default로 되어있으므로 값 정해야 함 !
         # print(model.wv.vectors.shape)
     # 모델 저장
-    model.save('dataset.model')
+    model.save('model/Kkma_dataset.model')
 
     word_vectors=model.wv
     vocabs=word_vectors.vocab.keys()# 사전
     word_vectors_list=[word_vectors[v] for v in vocabs]
     session.close()
-    # return model
+    #return model
     
 def findLink(set, keyword): # 학습결과를 model로 저장함
     session = Session()
@@ -57,11 +60,17 @@ def findLink(set, keyword): # 학습결과를 model로 저장함
     print(similar)
     for i in similar:
         train_data=session.query(Crawl.link).filter(Crawl.title.like('%'+i[0]+'%' or '%'+keyword+'%')).all()
-        print(train_data)
+        # print(train_data)
     session.close()
 
-# findSynonym()
-findLink('dataset.model', '장학')
+def findsimilar(set,keyword):
+    model=Word2Vec.load(set)
+    most_similar=model.wv.most_similar(keyword)
+    return most_similar
 
-# 몇 개 새로 올라오고
-# [키워드 알려줘 !] -> 새로 올라온 것 중에 알려줌
+# findSynonym()
+findLink('model/Kkma_dataset.model', '계절학기')
+# print("CBOW방식으로 했을 때 학습 결과 : ")
+# print(findsimilar('CBOW dataset.model','학기'))# 유사도
+# print("Skip-gram 방식으로 했을 때 학습 결과 : ")
+# print(findsimilar('Skip_gram dataset.model','학기'))# 유사도
