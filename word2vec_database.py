@@ -69,7 +69,10 @@ def findsimilar(set,keyword):
     return most_similar
 
 # findSynonym()
-findLink('model/Kkma_dataset.model', '계절학기')
+print("----------------기존 방법")
+findLink('model/Okt_dataset.model', '편입학')
+print("----------------새로운 방법")
+findLink('model/Kkma_dataset.model', '편입학')
 # print("CBOW방식으로 했을 때 학습 결과 : ")
 # print(findsimilar('CBOW dataset.model','학기'))# 유사도
 # print("Skip-gram 방식으로 했을 때 학습 결과 : ")
