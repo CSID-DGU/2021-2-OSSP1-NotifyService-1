@@ -66,8 +66,17 @@ def findLink(set, keyword): # 학습결과를 model로 저장함
 def findsimilar(set,keyword):
     model=Word2Vec.load(set)
     most_similar=model.wv.most_similar(keyword)
-    return most_similar
+    print(set+"을 사용한 "+keyword+" 와(과) 관련된 유사도 : ")
+    print(most_similar) 
 
+def findvocab(set):
+    model=Word2Vec.load(set)
+    
+    word_vectors=model.wv
+    vocabs=word_vectors.vocab.keys()# 사전
+
+    return vocabs   
+  
 # findSynonym()
 print("----------------기존 방법")
 findLink('model/Okt_dataset.model', '편입학')
