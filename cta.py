@@ -54,17 +54,17 @@ if __name__ == '__main__':
       {
         'to': [ '01074477163'], # array 사용으로 동일한 내용을 여러 수신번호에 전송 가능
         'from': '01074477163',
-        'text': '카카오톡채널 친구로 추가되어 있어야 친구톡 발송이 가능합니다.',
+        'text': '카카오톡채널 테스트 지원❤',
         'kakaoOptions': {
-          'pfId': 'KA01PF200323182344986oTFz9CIabcx'
-          # , 'buttons': [
-          #   {
-          #     'buttonType': 'WL', # 웹링크
-          #     'buttonName': '버튼 이름',
-          #     'linkMo': 'https://m.example.com',
-          #     'linkPc': 'https://example.com'     # 템플릿 등록 시 모바일링크만 입력하였다면 linkPc 값은 입력하시면 안됩니다.
-          #   }
-          # ]
+          'pfId': 'KA01PF211130075802780LDxZiwnOy9H'
+          , 'buttons': [
+            {
+              'buttonType': 'WL', # 웹링크
+              'buttonName': '공지사항 보러가기',
+              'linkMo': 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26740812&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0',
+              'linkPc': 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26740812&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0'     # 템플릿 등록 시 모바일링크만 입력하였다면 linkPc 값은 입력하시면 안됩니다.
+            }
+          ]
         }
       }
     ]
