@@ -13,6 +13,8 @@ import time
 import threading
 import datetime
 
+from new_db import findSimilar
+
 app = Flask(__name__)
 Base = declarative_base()
 engine = create_engine(
@@ -459,6 +461,7 @@ def crawl():
 
     return "크롤링 페이지"
 
+findSimilar(new_crawl_list)
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=3000, debug=True)
