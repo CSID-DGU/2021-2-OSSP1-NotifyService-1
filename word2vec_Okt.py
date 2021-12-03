@@ -48,6 +48,14 @@ def findSynonym():
 
     word_vectors=model.wv
     vocabs=word_vectors.vocab.keys()# 사전
+    remove_key=[]
+    for i in vocabs:
+        if len(i)==1:
+            remove_key.append(i)
+    for key in list(vocabs) : ## list와 keys()를 꼭 써야함.
+        if key in remove_key :
+            del word_vectors.vocab[key]
+    vocabs=word_vectors.vocab.keys()
     word_vectors_list=[word_vectors[v] for v in vocabs]
     session.close()
     #return model
@@ -72,8 +80,18 @@ def findvocab(set):
     
     word_vectors=model.wv
     vocabs=word_vectors.vocab.keys()# 사전
-
-    return vocabs   
+    remove_key=[]
+    print("제거전")
+    print(vocabs)
+    for i in vocabs:
+        if len(i)==1:
+            remove_key.append(i)
+    for key in list(vocabs) : ## list와 keys()를 꼭 써야함.
+        if key in remove_key :
+            del word_vectors.vocab[key]
+    print("제거후")
+    vocabs=word_vectors.vocab.keys()
+    print(vocabs)    
 
 schedule.every().monday.at("10:00").do(findSynonym) #매주 월요일 10시에 실행
 
@@ -84,4 +102,4 @@ while True:
 #findLink('dataset.model', '장학')
 #findsimilar('CBOW dataset.model','전과')# 유사도
 #findsimilar('Skip_gram dataset.model','전과')# 유사도
-#print(findvocab('CBOW dataset.model'))
+findvocab('model/CBOW dataset.model')
