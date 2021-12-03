@@ -13,6 +13,9 @@ from gensim.models.word2vec import Word2Vec
 from konlpy.tag import Kkma
 import tqdm
 
+import time
+import schedule
+
 
 engine = create_engine('postgresql://jrbysnbvqyvmie:4a2d878446a2864c6c7b9b16b965f58756035fea520bf6f682db34769ff6d053@ec2-44-198-236-169.compute-1.amazonaws.com:5432/db0sh1er7k2vqh')
 Session = sessionmaker()
@@ -50,6 +53,14 @@ def findSynonym():
 
     word_vectors=model.wv
     vocabs=word_vectors.vocab.keys()# 사전
+    remove_key=[]
+    for i in vocabs:
+        if len(i)==1:
+            remove_key.append(i)
+    for key in list(vocabs) : ## list와 keys()를 꼭 써야함.
+        if key in remove_key :
+            del word_vectors.vocab[key]
+    vocabs=word_vectors.vocab.keys()
     word_vectors_list=[word_vectors[v] for v in vocabs]
     session.close()
     #return model
@@ -76,9 +87,24 @@ def findvocab(set):
     
     word_vectors=model.wv
     vocabs=word_vectors.vocab.keys()# 사전
+    remove_key=[]
+    print("제거전")
+    print(vocabs)
+    for i in vocabs:
+        if len(i)==1:
+            remove_key.append(i)
+    for key in list(vocabs) : ## list와 keys()를 꼭 써야함.
+        if key in remove_key :
+            del word_vectors.vocab[key]
+    print("제거후")
+    vocabs=word_vectors.vocab.keys()
+    print(vocabs)   
 
-    return vocabs   
-  
+schedule.every().monday.at("10:00").do(findSynonym) #매주 월요일 10시에 실행
+
+while True:
+    schedule.run_pending()
+    time.sleep(1) 
 
 print(findvocab('model/Kkma_dataset.model'))
 # findSynonym()
