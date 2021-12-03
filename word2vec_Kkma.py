@@ -33,7 +33,7 @@ def tokenizeData():
     db_data=pd.DataFrame(db_data,columns = ['제목'])
     db_data['제목']= db_data['제목'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")#데이터 정규표현식 -> 특수문자 제거
 
-    # 불용어 처리
+    # 불용어 파일 불러오기
     stop_words= []
     with open('stopword.txt', encoding='utf-8') as f:
         for i in f:
@@ -57,10 +57,10 @@ def setModel():
     model.save('model/new_Kkma_dataset.model')
     return model
     
-def findLink(set, keyword): # 학습결과를 model로 저장함
+def findLink(set, keyword): 
     session = Session()
     model = Word2Vec.load(set)
-    similar = model.wv.most_similar(keyword)#사업과 가장 유사한 단어 
+    similar = model.wv.most_similar(keyword)
     for i in similar:
         links=session.query(Crawl.link).filter(Crawl.title.like('%'+i[0]+'%' or '%'+keyword+'%')).all()
     session.close()
@@ -77,17 +77,17 @@ def findVocab(set):
     word_vectors=model.wv
     vocabs=word_vectors.vocab.keys()# 사전
     remove_key=[]
-    print("제거전")
-    print(vocabs)
+    # print("제거전")
+    # print(vocabs)
     for i in vocabs:
         if len(i)==1:
             remove_key.append(i)
-    for key in list(vocabs) : ## list와 keys()를 꼭 써야함.
+    for key in list(vocabs) :
         if key in remove_key :
             del word_vectors.vocab[key]
-    print("제거후")
+    # print("제거후")
     vocabs=word_vectors.vocab.keys()
-    print(vocabs)   
+    # print(vocabs)   
     return vocabs   
   
 # findVocab('model/Kkma_dataset.model')
