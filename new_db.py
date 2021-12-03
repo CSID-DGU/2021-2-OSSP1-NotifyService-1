@@ -4,7 +4,7 @@ import tqdm
 from pprint import pprint
 
 #### new_crawl_list :  
-new_crawl_list = [['일반공지', '[일반공지] 교내시설 대관 제한 안내', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741219&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:47:58.928990'], 
+# new_crawl_list = [['일반공지', '[일반공지] 교내시설 대관 제한 안내', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741219&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:47:58.928990'], 
 # ['일반공지', '[일반공지] 2021학년도 동계방학 메이커스페이스MARU 근로장학생 [추가...', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741193&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:47:59.712425'], 
 # ['일반공지', '[일반공지] 2022 에몬스 슬로건 공모전 안내', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741183&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:00.500311'], 
 # ['일반공지', '[일반공지] 인공지능 학습용 데이터 온라인 해커톤 공모전 안내', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741180&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:01.281635'], 
@@ -14,8 +14,8 @@ new_crawl_list = [['일반공지', '[일반공지] 교내시설 대관 제한 �
 # ['일반공지', '[일반공지]제1회 일반교양 학생 아이디어 공모전 수상작 발표', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741143&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:04.408793'], 
 # ['일반공지', '[일반공지] [카운슬링센터] 온라인 심리검사 프로그램 안내', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741128&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0','2021-12-03 19:48:05.191510'], 
 # ['일반공지', '[일반공지] 2021년 동계 베트남 온라인 해외봉사 단원모집(재안내)', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741116&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:05.970713'], 
-['일반공지','[일반공지] 2021년 동계 필리핀 온라인 해외봉사 단원모집(재안내)', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741115&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:06.750168']
-]
+# ['일반공지','[일반공지] 2021년 동계 필리핀 온라인 해외봉사 단원모집(재안내)', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741115&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:06.750168']
+# ]
 
 # 불용어 처리 & 토큰화
 def tokenized(new_crawl_list):
@@ -53,4 +53,4 @@ def findSimilar(new_crawl_list):
                 pass
     return synonym
 
-pprint(findSimilar(new_crawl_list))
+# pprint(findSimilar(new_crawl_list))
