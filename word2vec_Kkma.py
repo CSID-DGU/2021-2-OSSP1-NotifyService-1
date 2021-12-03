@@ -33,7 +33,7 @@ def tokenizeData():
     db_data=pd.DataFrame(db_data,columns = ['제목'])
     db_data['제목']= db_data['제목'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")#데이터 정규표현식 -> 특수문자 제거
 
-    # 불용어 처리
+    # 불용어 파일 불러오기
     stop_words= []
     with open('stopword.txt', encoding='utf-8') as f:
         for i in f:
@@ -57,20 +57,24 @@ def setModel():
     model.save('model/new_Kkma_dataset.model')
     return model
     
-def findLink(set, keyword): # 학습결과를 model로 저장함
+def findLink(set, keyword): 
     session = Session()
-    model = Word2Vec.load(set)
-    similar = model.wv.most_similar(keyword)#사업과 가장 유사한 단어 
+    similar=findSimilar(set,keyword)
+    #print(similar)
     for i in similar:
         links=session.query(Crawl.link).filter(Crawl.title.like('%'+i[0]+'%' or '%'+keyword+'%')).all()
     session.close()
     return links
 
-# def findSimilar(set,keyword):
-#     model=Word2Vec.load(set)
-#     most_similar=model.wv.most_similar(keyword)
-#     print(set+"을 사용한 "+keyword+" 와(과) 관련된 유사도 : ")
-#     print(most_similar) 
+def findSimilar(set,keyword):
+    model=Word2Vec.load(set)
+    most_similar=model.wv.most_similar(keyword)
+    #print(most_similar) 
+    for i in most_similar:
+        if len(i[0])==1:
+            most_similar.remove(i)
+    most_similar=most_similar[:5]
+    return most_similar
 
 def findVocab(set):
     model=Word2Vec.load(set)
@@ -82,7 +86,7 @@ def findVocab(set):
     for i in vocabs:
         if len(i)==1:
             remove_key.append(i)
-    for key in list(vocabs) : ## list와 keys()를 꼭 써야함.
+    for key in list(vocabs) :
         if key in remove_key :
             del word_vectors.vocab[key]
     print("제거후")
@@ -90,15 +94,17 @@ def findVocab(set):
     print(vocabs)   
     return vocabs   
   
-# findVocab('model/Kkma_dataset.model')
 
-setModel()
+#findVocab('model/new_Kkma_dataset.model')
+print(findLink('model/new_Kkma_dataset.model','튜'))
 
-schedule.every().monday.at("10:00").do(setModel) #매주 월요일 10시에 실행
+# setModel()
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+# schedule.every().monday.at("10:00").do(setModel) #매주 월요일 10시에 실행
+
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
 
 
 # findSynonym()
