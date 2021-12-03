@@ -12,6 +12,9 @@ from gensim.models.word2vec import Word2Vec
 from konlpy.tag import Okt
 import tqdm
 
+import time
+import schedule
+
 
 engine = create_engine('postgresql://jrbysnbvqyvmie:4a2d878446a2864c6c7b9b16b965f58756035fea520bf6f682db34769ff6d053@ec2-44-198-236-169.compute-1.amazonaws.com:5432/db0sh1er7k2vqh')
 Session = sessionmaker()
@@ -72,7 +75,12 @@ def findvocab(set):
 
     return vocabs   
 
-findSynonym()
+schedule.every().monday.at("10:00").do(findSynonym) #매주 월요일 10시에 실행
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
+
 #findLink('dataset.model', '장학')
 #findsimilar('CBOW dataset.model','전과')# 유사도
 #findsimilar('Skip_gram dataset.model','전과')# 유사도
