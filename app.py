@@ -423,6 +423,7 @@ def crawl():
                         new_crawl_list[new_crawl_count].append(link)
                         new_crawl_list[new_crawl_count].append(now_time)
                         new_crawl_count += 1
+                        findSimilar(new_crawl_list)
                     else:
                         print('     실패 : [' + category + ']' + name + ' >> ' + link)
 
@@ -461,7 +462,6 @@ def crawl():
 
     return "크롤링 페이지"
 
-findSimilar(new_crawl_list)
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=3000, debug=True)
