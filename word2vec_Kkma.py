@@ -10,8 +10,10 @@ import re
 from gensim.models.word2vec import Word2Vec
 from konlpy.tag import Kkma
 import tqdm
+
 import time
 import schedule
+
 
 engine = create_engine('postgresql://jrbysnbvqyvmie:4a2d878446a2864c6c7b9b16b965f58756035fea520bf6f682db34769ff6d053@ec2-44-198-236-169.compute-1.amazonaws.com:5432/db0sh1er7k2vqh')
 Session = sessionmaker()
