@@ -57,24 +57,24 @@ def setModel():
     model.save('model/new_Kkma_dataset.model')
     return model
     
-def findLink(set, keyword): 
-    session = Session()
-    similar=findSimilar(set,keyword)
-    #print(similar)
-    for i in similar:
-        links=session.query(Crawl.link).filter(Crawl.title.like('%'+i[0]+'%' or '%'+keyword+'%')).all()
-    session.close()
-    return links
+# def findLink(set, keyword): 
+#     session = Session()
+#     similar=findSimilar(set,keyword)
+#     #print(similar)
+#     for i in similar:
+#         links=session.query(Crawl.link).filter(Crawl.title.like('%'+i[0]+'%' or '%'+keyword+'%')).all()
+#     session.close()
+#     return links
 
-def findSimilar(set,keyword):
-    model=Word2Vec.load(set)
-    most_similar=model.wv.most_similar(keyword)
-    #print(most_similar) 
-    for i in most_similar:
-        if len(i[0])==1:
-            most_similar.remove(i)
-    most_similar=most_similar[:5]
-    return most_similar
+# def findSimilar(set,keyword):
+#     model=Word2Vec.load(set)
+#     most_similar=model.wv.most_similar(keyword)
+#     #print(most_similar) 
+#     for i in most_similar:
+#         if len(i[0])==1:
+#             most_similar.remove(i)
+#     most_similar=most_similar[:5]
+#     return most_similar
 
 def findVocab(set):
     model=Word2Vec.load(set)
@@ -96,7 +96,7 @@ def findVocab(set):
   
 
 #findVocab('model/new_Kkma_dataset.model')
-print(findLink('model/new_Kkma_dataset.model','튜'))
+# print(findLink('model/new_Kkma_dataset.model','튜'))
 
 # setModel()
 
