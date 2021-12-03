@@ -12,6 +12,9 @@ from bs4 import BeautifulSoup
 import time
 import threading
 import datetime
+#전화번호 인증
+import requests
+import json
 
 from new_db import findSimilar
 
@@ -31,6 +34,47 @@ def index():
     session.close()
     return msg
 
+
+@app.route('/certification', methods=['POST'])
+def certification():
+    req = request.get_json()
+    session = Session()
+    rest_api = '?rest_api_key=1c59531be6e6ce9c2edbd4a719e2b919'
+    id = req["userRequest"]["user"]["id"]
+    url = (json.loads(req["action"]["detailParams"]["profile"]["value"]))["otp"] + rest_api
+    response = requests.get(url).json()
+    phone = response["phone_number"]
+    
+    if (phone.find('+82') == -1):
+        answer = '잘못된 전화번호입니다.'
+    else :
+        phone = phone.replace('+82 ','0').replace('-','')
+        user = session.query(User.id).filter_by(id=id).all();
+        if (user == []):
+            session.add(User(id=id, college=None, department=None, phone = phone))
+            session.commit()
+            answer = "정보가 저장되었습니다."
+        else:
+            conn = engine.connect()
+            stmt = update(User).where(User.id == id).values(phone = phone)
+            conn.execute(stmt)
+            conn.close()
+            answer = "정보가 수정되었습니다."
+    session.close()
+    
+    res = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "simpleText": {
+                        "text": answer
+                    }
+                }
+            ]
+        }
+    }
+    return jsonify(res)
 
 @app.route('/department', methods=['POST'])
 def department():
@@ -110,6 +154,38 @@ def keywords():
         }
     }
     return jsonify(res)
+
+
+""" 한번에 알림줄때 쓰려했던 것
+@app.route('/notify')#, methods=['POST'])
+def notify():
+    session = Session()
+    #req = request.get_json()
+    #id = req["userRequest"]["user"]["id"]
+    #keyword = req["action"]["detailParams"]["keyword"]["value"]
+    id = '25513aed053242a1f105fe1089b05aa0f60dc01ac787fe9b96f66b88f892b8ab3b'
+    keyword = '수강신청'
+    keys = session.query(Keywords.key).filter_by(id=id, key=keyword).first();
+    user = session.query(User.college, User.department).filter_by(id=id).first();
+    if (user == None):
+        answer = "유저 정보를 등록하시고 다시 요청해주세요."
+    elif (keys == None):
+        answer = "등록되지 않은 키워드입니다."
+        return answer
+    else :
+        time = session.query(Keywords.notified_time).filter_by(id=id, key=keyword).first();
+        if (time == None):
+            time = '0'
+        print(time)
+        conn = engine.connect()
+        stmt = update(Keywords).where(Keywords.id == id, Keywords.key == keys[0]).values(notified_time=datetime.datetime.now())
+        conn.execute(stmt)
+        conn.close()
+        answer = findLink('dataset.model', keys[0], user[0], user[1])
+        return answer
+    
+    #return jsonify(res)
+"""
 
 
 @app.route('/test', methods=['POST'])

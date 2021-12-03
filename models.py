@@ -10,11 +10,13 @@ class User(db.Model):
     id = db.Column(db.String(100), primary_key=True)
     college = db.Column(db.String(5))
     department = db.Column(db.String(30))
+    phone = db.Column(db.String(15))
 
-    def __init__(self, id, college, department):
+    def __init__(self, id, college, department, phone):
         self.id = id
         self.college = college
         self.department = department
+        self.phone = phone
 
 
 class Keywords(db.Model):
@@ -23,10 +25,12 @@ class Keywords(db.Model):
 
     id = db.Column(db.String(100), primary_key=True)
     key = db.Column(db.String(10), primary_key=True)
+    notified_time = db.Column(db.String(30))
 
-    def __init__(self, id, key):
+    def __init__(self, id, key, notified_time):
         self.id = id
         self.key = key
+        self.notified_time = notified_time
 
 
 class Crawl(db.Model):
