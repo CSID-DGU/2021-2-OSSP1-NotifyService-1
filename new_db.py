@@ -14,7 +14,8 @@ from pprint import pprint
 # ['일반공지', '[일반공지]제1회 일반교양 학생 아이디어 공모전 수상작 발표', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741143&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:04.408793'], 
 # ['일반공지', '[일반공지] [카운슬링센터] 온라인 심리검사 프로그램 안내', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741128&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0','2021-12-03 19:48:05.191510'], 
 # ['일반공지', '[일반공지] 2021년 동계 베트남 온라인 해외봉사 단원모집(재안내)', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741116&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:05.970713'], 
-# ['일반공지','[일반공지] 2021년 동계 필리핀 온라인 해외봉사 단원모집(재안내)', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741115&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:06.750168']]
+# ['일반공지','[일반공지] 2021년 동계 필리핀 온라인 해외봉사 단원모집(재안내)', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741115&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:06.750168']
+# ]
 
 # 불용어 처리 & 토큰화
 def tokenized(new_crawl_list):
@@ -29,8 +30,8 @@ def tokenized(new_crawl_list):
     for sentence in tqdm.tqdm(new_crawl_list):
         tokenized_sentence = kkma.nouns(sentence[1])
         stopwords_removed_sentence = [word for word in tokenized_sentence if not word in stop_words] # 불용어 제거
+        stopwords_removed_sentence.append(sentence[2])
         tokenized_data.append(stopwords_removed_sentence)
-
     return tokenized_data
 
 # 유사단어 찾기
@@ -38,10 +39,16 @@ def findSimilar(new_crawl_list):
     synonym = []
     tokenized_data = tokenized(new_crawl_list)
     model=Word2Vec.load('model/Kkma_dataset.model')
-    for i in tokenized_data:
-        for j in i :
+    for i in tokenized_data: # [대관, 제한, 링크]
+        for j in range(len(i)-1) : # 0, 1
             try :
-                synonym.append(model.wv.most_similar(j))
+                a_synonym = model.wv.most_similar(i[j])
+                for k in a_synonym:
+                    if len(k[0]) == 1:
+                        a_synonym.remove(k)
+                a_synonym = a_synonym[:5]
+                a_synonym.append(i[-1])
+                synonym.append(a_synonym)
             except KeyError:
                 pass
     return synonym
