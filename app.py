@@ -16,7 +16,7 @@ import datetime
 import requests
 import json
 
-from new_db import findSimilar
+from new_db import send_kakao
 
 app = Flask(__name__)
 Base = declarative_base()
@@ -499,7 +499,10 @@ def crawl():
                         new_crawl_list[new_crawl_count].append(link)
                         new_crawl_list[new_crawl_count].append(now_time)
                         new_crawl_count += 1
-                        findSimilar(new_crawl_list)
+
+                        # 유사 단어 찾아서 알림 발송하기
+                        #findSimilar(new_crawl_list)
+                        send_kakao(new_crawl_list)
                     else:
                         print('     실패 : [' + category + ']' + name + ' >> ' + link)
 
