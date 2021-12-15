@@ -16,7 +16,9 @@ from models import User, Keywords
 from pprint import pprint
 
 #### new_crawl_list :
-new_crawl_list = ['이과대학 수학과', '제16회 이과대학 재학생 연구프로젝트 경진대회 개최 안내', 'https://math.dongguk.edu/?page_id=260/?page_id=260&pageid=1&uid=60&mod=document', '20211127193112']
+new_crawl_list = ['공과대학', '제16회 이과대학 재학생 연구프로젝트 경진대회 개최 안내', 'https://math.dongguk.edu/?page_id=260/?page_id=260&pageid=1&uid=60&mod=document', '20211127193112']
+
+all_category = ['일반공지', '학사공지', '장학공지', '입시공지', '국제공지', '학술/행사공지']
 
 # DB 연결
 engine = create_engine(
@@ -88,7 +90,7 @@ def send_kakao():
     users_id = []  # DB에서 조회할 사용자의 id
     temp_phone = []  # DB에서 조회할 사용자의 핸드폰번호
     users_phone = []  # DB에서 조회할 사용자의 핸드폰번호
-    users_info = [] # users_id에 단과대 + 학과 + 단과대 학과 포함
+    users_filter = [] # users_id에 단과대와 학과까지 필터된 학생 정보
 
     for word in words_list:
         user = session.query(Keywords.id, User.college, User.department).filter_by(key= word)
@@ -97,16 +99,17 @@ def send_kakao():
             users_id.extend(list(join_user))
     users_id = list(set(users_id))  # 중복 데이터 제거
     
-    # '이과대학 수학과'를 비교하기 위한 단계
-    # if문이 성립하면 users_info에 대입
-    for data in users_id:
-        college_department = ' '.join(data[1:3])
-        if new_crawl_list[0] == college_department:
-            new_data = list(data)
-            new_data.append(college_department)
-            users_info.append(new_data)
+    # 전체공지와 학과/단과대별 공지를 구별
+    if new_crawl_list[0] not in all_category: # all_category에 없다면
+        # if문이 성립하면 users_info에 대입
+        for data in users_id:
+            college_department = ' '.join(data[1:3]) # 이과대학 수학과
+            if new_crawl_list[0] == college_department or new_crawl_list[0] == data[1]:
+                users_filter.append(data)
+    else: # all_category에 있다면 -> 모든 유저에게 전체 발송
+        users_filter = users_id
 
-    for key in users_info:
+    for key in users_filter:
         phone = session.query(User.phone).filter_by(id=key[0]).all()
         if phone:
             temp_phone.extend(list(phone))
