@@ -10,12 +10,13 @@ import hmac
 import hashlib
 import requests
 # DB 연결
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 from models import User, Keywords
+from pprint import pprint
 
 #### new_crawl_list :
-# new_crawl_list = ['일반공지', '[일반공지] 교내시설 대관 제한 안내', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741219&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:47:58.928990']
+new_crawl_list = ['이과대학 수학과', '제16회 이과대학 재학생 연구프로젝트 경진대회 개최 안내', 'https://math.dongguk.edu/?page_id=260/?page_id=260&pageid=1&uid=60&mod=document', '20211127193112']
 
 # DB 연결
 engine = create_engine(
@@ -74,12 +75,14 @@ def findSimilar(new_crawl_list):
     # print(" >> 유사단어 추출 완료 : " + str(len(similar_words)) + " 개, " + str(similar_words))
     return similar_words
 # 형식
-# ['동일유사', '폐지', '교과목명', '변동안내', '유사', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741219&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0']
+# ['경연', '이과', '경진대회', '개별', '경연대회', '경진', '법과', '연구프로젝트', '예술대학', '교수님', '개최', '포트', '실적', '이과대학', '활용', '아이디어', '개별연구', '공과대학', '폴리오', '비교법연구등', '제권', '설계프로젝트', '프로젝트', '대회', '법과대학', '미래융합대학', '어드벤처디자인경진대회', '학술대회', 'https://math.dongguk.edu/?page_id=260/?page_id=260&pageid=1&uid=60&mod=document']
 
 # 카카오톡 발송 관련
-def send_kakao(new_crawl_list):
+# def send_kakao(new_crawl_list):
+def send_kakao():
     session = Session()  # DB 세션 생성
-    words_list = findSimilar(new_crawl_list)  # 유사 단어 리턴받을 리스트
+    # words_list = findSimilar(new_crawl_list)  # 유사 단어 리턴받을 리스트
+    words_list = ['경연', '이과', '경진대회', '개별', '경연대회', '경진', '법과', '연구프로젝트', '예술대학', '교수님', '개최', '포트', '실적', '이과대학', '활용', '아이디어', '개별연구', '공과대학', '폴리오', '비교법연구등', '제권', '설계프로젝트', '프로젝트', '대회', '법과대학', '미래융합대학', '어드벤처디자인경진대회', '학술대회', 'https://math.dongguk.edu/?page_id=260/?page_id=260&pageid=1&uid=60&mod=document']
     link = words_list[-1]  # 현재 크롤링한 데이터의 URL 주소
     words_list.remove(link)  # 리스트에서 링크 제거
     users_id = []  # DB에서 조회할 사용자의 id
@@ -87,9 +90,10 @@ def send_kakao(new_crawl_list):
     users_phone = []  # DB에서 조회할 사용자의 핸드폰번호
 
     for word in words_list:
-        user = session.query(Keywords.id).filter_by(key=word).all()
-        if user:
-            users_id.extend(list(user))
+        user = session.query(Keywords.id, User.department).filter_by(key= word)
+        join_user = user.join(User, Keywords.id == User.id).all()
+        if join_user:
+            users_id.extend(list(join_user))
     users_id = list(set(users_id))  # 중복 데이터 제거
 
     for key in users_id:
@@ -103,34 +107,33 @@ def send_kakao(new_crawl_list):
         users_phone.append(test)
 
     if len(users_phone) > 0:
-        print("카카오톡 발송 대상 있음 (" + str(len(users_phone)) + "명")
-        data = {
-            'messages': [
-                {
-                    'to': users_phone,
-                    'from': '01074477163',
-                    'text': '등록하신 키워드와 연관있는 공지가 등록되었습니다. 링크를 클릭하시면 해당 공지로 연결됩니다 :)',
-                    'kakaoOptions': {
-                        'pfId': 'KA01PF211130075802780LDxZiwnOy9H'
-                        , 'buttons': [
-                            {
-                                'buttonType': 'WL',  # 웹링크
-                                'buttonName': '공지사항 보러가기',
-                                'linkMo': link,
-                                'linkPc': link
-                            }
-                        ]
-                    }
-                }
-            ]
-        }
-        res = sendMany(data)
-        print(json.dumps(res.json(), indent=2, ensure_ascii=False))
+        print("카카오톡 발송 대상 있음 (" + str(len(users_phone)) + "명)")
+        # data = {
+        #     'messages': [
+        #         {
+        #             'to': users_phone,
+        #             'from': '01074477163',
+        #             'text': '등록하신 키워드와 연관있는 공지가 등록되었습니다. 링크를 클릭하시면 해당 공지로 연결됩니다 :)',
+        #             'kakaoOptions': {
+        #                 'pfId': 'KA01PF211130075802780LDxZiwnOy9H'
+        #                 , 'buttons': [
+        #                     {
+        #                         'buttonType': 'WL',  # 웹링크
+        #                         'buttonName': '공지사항 보러가기',
+        #                         'linkMo': link,
+        #                         'linkPc': link
+        #                     }
+        #                 ]
+        #             }
+        #         }
+        #     ]
+        # }
+        # res = sendMany(data)
+        # print(json.dumps(res.json(), indent=2, ensure_ascii=False))
     else:
         print("카카오톡 발송 대상 없음")
 
     return None
-
 
 def unique_id():
     return str(uuid.uuid1().hex)
@@ -167,3 +170,6 @@ def getUrl(path):
 
 def sendMany(data):
     return requests.post(getUrl('/messages/v4/send-many'), headers=get_headers(apiKey, apiSecret), json=data)
+
+# pprint(send_kakao())
+send_kakao()
