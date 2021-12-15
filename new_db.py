@@ -91,7 +91,7 @@ def findSimilar(new_crawl_list):
 
     similar_words = list(set(similar_words))
     similar_words.append(link)
-    print(" >> 유사단어 추출 완료 : " + str(len(similar_words)) + " 개")
+    print(" >> 유사단어 추출 완료 : " + str(len(similar_words)) + " 개, " + str(similar_words))
     return similar_words
 
 
@@ -102,7 +102,7 @@ def send_kakao(new_crawl_list):
     link = words_list[-1]                           # 현재 크롤링한 데이터의 URL 주소
     words_list.remove(link)                         # 리스트에서 링크 제거
     users_id = []                                   # DB에서 조회할 사용자의 id
-    temp_phone = []                                # DB에서 조회할 사용자의 핸드폰번호
+    temp_phone = []                                 # DB에서 조회할 사용자의 핸드폰번호
     users_phone = []                                # DB에서 조회할 사용자의 핸드폰번호
 
     for word in words_list:
@@ -115,36 +115,39 @@ def send_kakao(new_crawl_list):
         phone = session.query(User.phone).filter_by(id=key[0]).all()
         if phone:
             temp_phone.extend(list(phone))
-    temp_phone = list(set(temp_phone))                  # 중복 데이터 제거
+    temp_phone = list(set(temp_phone))              # 중복 데이터 제거
 
     for phone in temp_phone:
         test = phone[0]
         users_phone.append(test)
-
-    # 카카오톡 발송
-    data = {
-        'messages': [
-            {
-                'to': users_phone,
-                'from': '01074477163',
-                'text': '등록하신 키워드와 연관있는 공지가 등록되었습니다. 링크를 클릭하시면 해당 공지로 연결됩니다 :)',
-                'kakaoOptions': {
-                    'pfId': 'KA01PF211130075802780LDxZiwnOy9H'
-                    , 'buttons': [
-                        {
-                            'buttonType': 'WL',  # 웹링크
-                            'buttonName': '공지사항 보러가기',
-                            'linkMo': link,
-                            'linkPc': link
-                        }
-                    ]
+        
+    if len(users_phone) > 0:
+        print("카카오톡 발송 대상 있음 (" + str(len(users_phone)) + "명")
+        data = {
+            'messages': [
+                {
+                    'to': users_phone,
+                    'from': '01074477163',
+                    'text': '등록하신 키워드와 연관있는 공지가 등록되었습니다. 링크를 클릭하시면 해당 공지로 연결됩니다 :)',
+                    'kakaoOptions': {
+                        'pfId': 'KA01PF211130075802780LDxZiwnOy9H'
+                        , 'buttons': [
+                            {
+                                'buttonType': 'WL',  # 웹링크
+                                'buttonName': '공지사항 보러가기',
+                                'linkMo': link,
+                                'linkPc': link
+                            }
+                        ]
+                    }
                 }
-            }
-        ]
-    }
-    res = sendMany(data)
-    print(json.dumps(res.json(), indent=2, ensure_ascii=False))
-
+            ]
+        }
+        res = sendMany(data)
+        print(json.dumps(res.json(), indent=2, ensure_ascii=False))
+    else:
+        print("카카오톡 발송 대상 없음")
+        
     return None
 
 
