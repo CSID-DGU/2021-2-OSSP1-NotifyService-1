@@ -16,8 +16,7 @@ from models import User, Keywords
 from pprint import pprint
 
 #### new_crawl_list :
-new_crawl_list = ['공과대학', '제16회 이과대학 재학생 연구프로젝트 경진대회 개최 안내', 'https://math.dongguk.edu/?page_id=260/?page_id=260&pageid=1&uid=60&mod=document', '20211127193112']
-
+new_crawl_list = ['이과대학', '제16회 이과대학 재학생 연구프로젝트 경진대회 개최 안내', 'https://math.dongguk.edu/?page_id=260/?page_id=260&pageid=1&uid=60&mod=document', '20211127193112']
 all_category = ['일반공지', '학사공지', '장학공지', '입시공지', '국제공지', '학술/행사공지']
 
 # DB 연결
@@ -80,11 +79,9 @@ def findSimilar(new_crawl_list):
 # ['경연', '이과', '경진대회', '개별', '경연대회', '경진', '법과', '연구프로젝트', '예술대학', '교수님', '개최', '포트', '실적', '이과대학', '활용', '아이디어', '개별연구', '공과대학', '폴리오', '비교법연구등', '제권', '설계프로젝트', '프로젝트', '대회', '법과대학', '미래융합대학', '어드벤처디자인경진대회', '학술대회', 'https://math.dongguk.edu/?page_id=260/?page_id=260&pageid=1&uid=60&mod=document']
 
 # 카카오톡 발송 관련
-# def send_kakao(new_crawl_list):
-def send_kakao():
+def send_kakao(new_crawl_list):
     session = Session()  # DB 세션 생성
-    # words_list = findSimilar(new_crawl_list)  # 유사 단어 리턴받을 리스트
-    words_list = ['경연', '이과', '경진대회', '개별', '경연대회', '경진', '법과', '연구프로젝트', '예술대학', '교수님', '개최', '포트', '실적', '이과대학', '활용', '아이디어', '개별연구', '공과대학', '폴리오', '비교법연구등', '제권', '설계프로젝트', '프로젝트', '대회', '법과대학', '미래융합대학', '어드벤처디자인경진대회', '학술대회', 'https://math.dongguk.edu/?page_id=260/?page_id=260&pageid=1&uid=60&mod=document']
+    words_list = findSimilar(new_crawl_list)  # 유사 단어 리턴받을 리스트
     link = words_list[-1]  # 현재 크롤링한 데이터의 URL 주소
     words_list.remove(link)  # 리스트에서 링크 제거
     users_id = []  # DB에서 조회할 사용자의 id
@@ -108,6 +105,9 @@ def send_kakao():
                 users_filter.append(data)
     else: # all_category에 있다면 -> 모든 유저에게 전체 발송
         users_filter = users_id
+    # users_filter 형식
+    # [('1cb5b6d8833f9d1eb13cbebe3d60ce6bdb70559fa1bf9e1fc5bdb6fb5a426f8e30', '이과대학', '수학과'),
+    # ('25513aed053242a1f105fe1089b05aa0f60dc01ac787fe9b96f66b88f892b8ab3b', '이과대학', '통계학과')]
 
     for key in users_filter:
         phone = session.query(User.phone).filter_by(id=key[0]).all()
@@ -118,7 +118,8 @@ def send_kakao():
     for phone in temp_phone:
         test = phone[0]
         users_phone.append(test)
-    print(users_phone)
+    # users_phone 형식
+    # ['01045678900', '01012345678']
 
     if len(users_phone) > 0:
         print("카카오톡 발송 대상 있음 (" + str(len(users_phone)) + "명)")
@@ -185,5 +186,4 @@ def getUrl(path):
 def sendMany(data):
     return requests.post(getUrl('/messages/v4/send-many'), headers=get_headers(apiKey, apiSecret), json=data)
 
-# pprint(send_kakao())
-send_kakao()
+send_kakao(new_crawl_list)
