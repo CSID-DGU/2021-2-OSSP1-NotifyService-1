@@ -1,3 +1,5 @@
+# 모델을 만들기 위한 코드
+
 from flask import Flask, request, jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
