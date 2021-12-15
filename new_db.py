@@ -29,7 +29,8 @@ from models import User, Keywords
 # ]
 
 # DB 연결
-engine = create_engine('postgresql://jrbysnbvqyvmie:4a2d878446a2864c6c7b9b16b965f58756035fea520bf6f682db34769ff6d053@ec2-44-198-236-169.compute-1.amazonaws.com:5432/db0sh1er7k2vqh')
+engine = create_engine(
+    'postgresql://jrbysnbvqyvmie:4a2d878446a2864c6c7b9b16b965f58756035fea520bf6f682db34769ff6d053@ec2-44-198-236-169.compute-1.amazonaws.com:5432/db0sh1er7k2vqh')
 Session = sessionmaker()
 Session.configure(bind=engine)
 
@@ -97,30 +98,30 @@ def findSimilar(new_crawl_list):
 
 # 카카오톡 발송 관련
 def send_kakao(new_crawl_list):
-    session = Session()                             # DB 세션 생성
-    words_list = findSimilar(new_crawl_list)        # 유사 단어 리턴받을 리스트
-    link = words_list[-1]                           # 현재 크롤링한 데이터의 URL 주소
-    words_list.remove(link)                         # 리스트에서 링크 제거
-    users_id = []                                   # DB에서 조회할 사용자의 id
-    temp_phone = []                                 # DB에서 조회할 사용자의 핸드폰번호
-    users_phone = []                                # DB에서 조회할 사용자의 핸드폰번호
+    session = Session()  # DB 세션 생성
+    words_list = findSimilar(new_crawl_list)  # 유사 단어 리턴받을 리스트
+    link = words_list[-1]  # 현재 크롤링한 데이터의 URL 주소
+    words_list.remove(link)  # 리스트에서 링크 제거
+    users_id = []  # DB에서 조회할 사용자의 id
+    temp_phone = []  # DB에서 조회할 사용자의 핸드폰번호
+    users_phone = []  # DB에서 조회할 사용자의 핸드폰번호
 
     for word in words_list:
         user = session.query(Keywords.id).filter_by(key=word).all()
         if user:
             users_id.extend(list(user))
-    users_id = list(set(users_id))                  # 중복 데이터 제거
+    users_id = list(set(users_id))  # 중복 데이터 제거
 
     for key in users_id:
         phone = session.query(User.phone).filter_by(id=key[0]).all()
         if phone:
             temp_phone.extend(list(phone))
-    temp_phone = list(set(temp_phone))              # 중복 데이터 제거
+    temp_phone = list(set(temp_phone))  # 중복 데이터 제거
 
     for phone in temp_phone:
         test = phone[0]
         users_phone.append(test)
-        
+
     if len(users_phone) > 0:
         print("카카오톡 발송 대상 있음 (" + str(len(users_phone)) + "명")
         data = {
@@ -147,7 +148,7 @@ def send_kakao(new_crawl_list):
         print(json.dumps(res.json(), indent=2, ensure_ascii=False))
     else:
         print("카카오톡 발송 대상 없음")
-        
+
     return None
 
 
