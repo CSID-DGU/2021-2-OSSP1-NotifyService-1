@@ -29,7 +29,8 @@ from models import User, Keywords
 # ]
 
 # DB 연결
-engine = create_engine('postgresql://jrbysnbvqyvmie:4a2d878446a2864c6c7b9b16b965f58756035fea520bf6f682db34769ff6d053@ec2-44-198-236-169.compute-1.amazonaws.com:5432/db0sh1er7k2vqh')
+engine = create_engine(
+    'postgresql://jrbysnbvqyvmie:4a2d878446a2864c6c7b9b16b965f58756035fea520bf6f682db34769ff6d053@ec2-44-198-236-169.compute-1.amazonaws.com:5432/db0sh1er7k2vqh')
 Session = sessionmaker()
 Session.configure(bind=engine)
 
@@ -91,59 +92,62 @@ def findSimilar(new_crawl_list):
 
     similar_words = list(set(similar_words))
     similar_words.append(link)
-    print(" >> 유사단어 추출 완료 : " + str(len(similar_words)) + " 개")
+    print(" >> 유사단어 추출 완료 : " + str(len(similar_words)) + " 개, " + str(similar_words))
     return similar_words
 
 
 # 카카오톡 발송 관련
 def send_kakao(new_crawl_list):
-    session = Session()                             # DB 세션 생성
-    words_list = findSimilar(new_crawl_list)        # 유사 단어 리턴받을 리스트
-    link = words_list[-1]                           # 현재 크롤링한 데이터의 URL 주소
-    words_list.remove(link)                         # 리스트에서 링크 제거
-    users_id = []                                   # DB에서 조회할 사용자의 id
-    temp_phone = []                                # DB에서 조회할 사용자의 핸드폰번호
-    users_phone = []                                # DB에서 조회할 사용자의 핸드폰번호
+    session = Session()  # DB 세션 생성
+    words_list = findSimilar(new_crawl_list)  # 유사 단어 리턴받을 리스트
+    link = words_list[-1]  # 현재 크롤링한 데이터의 URL 주소
+    words_list.remove(link)  # 리스트에서 링크 제거
+    users_id = []  # DB에서 조회할 사용자의 id
+    temp_phone = []  # DB에서 조회할 사용자의 핸드폰번호
+    users_phone = []  # DB에서 조회할 사용자의 핸드폰번호
 
     for word in words_list:
         user = session.query(Keywords.id).filter_by(key=word).all()
         if user:
             users_id.extend(list(user))
-    users_id = list(set(users_id))                  # 중복 데이터 제거
+    users_id = list(set(users_id))  # 중복 데이터 제거
 
     for key in users_id:
         phone = session.query(User.phone).filter_by(id=key[0]).all()
         if phone:
             temp_phone.extend(list(phone))
-    temp_phone = list(set(temp_phone))                  # 중복 데이터 제거
+    temp_phone = list(set(temp_phone))  # 중복 데이터 제거
 
     for phone in temp_phone:
         test = phone[0]
         users_phone.append(test)
 
-    # 카카오톡 발송
-    data = {
-        'messages': [
-            {
-                'to': users_phone,
-                'from': '01074477163',
-                'text': '등록하신 키워드와 연관있는 공지가 등록되었습니다. 링크를 클릭하시면 해당 공지로 연결됩니다 :)',
-                'kakaoOptions': {
-                    'pfId': 'KA01PF211130075802780LDxZiwnOy9H'
-                    , 'buttons': [
-                        {
-                            'buttonType': 'WL',  # 웹링크
-                            'buttonName': '공지사항 보러가기',
-                            'linkMo': link,
-                            'linkPc': link
-                        }
-                    ]
+    if len(users_phone) > 0:
+        print("카카오톡 발송 대상 있음 (" + str(len(users_phone)) + "명")
+        data = {
+            'messages': [
+                {
+                    'to': users_phone,
+                    'from': '01074477163',
+                    'text': '등록하신 키워드와 연관있는 공지가 등록되었습니다. 링크를 클릭하시면 해당 공지로 연결됩니다 :)',
+                    'kakaoOptions': {
+                        'pfId': 'KA01PF211130075802780LDxZiwnOy9H'
+                        , 'buttons': [
+                            {
+                                'buttonType': 'WL',  # 웹링크
+                                'buttonName': '공지사항 보러가기',
+                                'linkMo': link,
+                                'linkPc': link
+                            }
+                        ]
+                    }
                 }
-            }
-        ]
-    }
-    res = sendMany(data)
-    print(json.dumps(res.json(), indent=2, ensure_ascii=False))
+            ]
+        }
+        res = sendMany(data)
+        print(json.dumps(res.json(), indent=2, ensure_ascii=False))
+    else:
+        print("카카오톡 발송 대상 없음")
 
     return None
 
@@ -183,31 +187,3 @@ def getUrl(path):
 
 def sendMany(data):
     return requests.post(getUrl('/messages/v4/send-many'), headers=get_headers(apiKey, apiSecret), json=data)
-
-
-# 한번 요청으로 1만건의 메시지 발송이 가능합니다.
-if __name__ == '__main__':
-    data = {
-        'messages': [
-            # 알림톡 발송
-            {
-                'to': ['01074477163'],  # array 사용으로 동일한 내용을 여러 수신번호에 전송 가능
-                'from': '01074477163',
-                'text': '카카오톡채널 테스트 지원❤',
-                'kakaoOptions': {
-                    'pfId': 'KA01PF211130075802780LDxZiwnOy9H'
-                    , 'buttons': [
-                        {
-                            'buttonType': 'WL',  # 웹링크
-                            'buttonName': '공지사항 보러가기',
-                            'linkMo': 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26740812&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0',
-                            'linkPc': 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26740812&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0'
-                            # 템플릿 등록 시 모바일링크만 입력하였다면 linkPc 값은 입력하시면 안됩니다.
-                        }
-                    ]
-                }
-            }
-        ]
-    }
-    res = sendMany(data)
-    print(json.dumps(res.json(), indent=2, ensure_ascii=False))
