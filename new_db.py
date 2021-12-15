@@ -88,15 +88,25 @@ def send_kakao():
     users_id = []  # DB에서 조회할 사용자의 id
     temp_phone = []  # DB에서 조회할 사용자의 핸드폰번호
     users_phone = []  # DB에서 조회할 사용자의 핸드폰번호
+    users_info = [] # users_id에 단과대 + 학과 + 단과대 학과 포함
 
     for word in words_list:
-        user = session.query(Keywords.id, User.department).filter_by(key= word)
+        user = session.query(Keywords.id, User.college, User.department).filter_by(key= word)
         join_user = user.join(User, Keywords.id == User.id).all()
         if join_user:
             users_id.extend(list(join_user))
     users_id = list(set(users_id))  # 중복 데이터 제거
+    
+    # '이과대학 수학과'를 비교하기 위한 단계
+    # if문이 성립하면 users_info에 대입
+    for data in users_id:
+        college_department = ' '.join(data[1:3])
+        if new_crawl_list[0] == college_department:
+            new_data = list(data)
+            new_data.append(college_department)
+            users_info.append(new_data)
 
-    for key in users_id:
+    for key in users_info:
         phone = session.query(User.phone).filter_by(id=key[0]).all()
         if phone:
             temp_phone.extend(list(phone))
@@ -105,6 +115,7 @@ def send_kakao():
     for phone in temp_phone:
         test = phone[0]
         users_phone.append(test)
+    print(users_phone)
 
     if len(users_phone) > 0:
         print("카카오톡 발송 대상 있음 (" + str(len(users_phone)) + "명)")
