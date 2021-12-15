@@ -10,23 +10,14 @@ import hmac
 import hashlib
 import requests
 # DB 연결
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 from models import User, Keywords
+from pprint import pprint
 
 #### new_crawl_list :
-# new_crawl_list = [['일반공지', '[일반공지] 교내시설 대관 제한 안내', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741219&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:47:58.928990'],
-# ['일반공지', '[일반공지] 2021학년도 동계방학 메이커스페이스MARU 근로장학생 [추가...', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741193&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:47:59.712425'],
-# ['일반공지', '[일반공지] 2022 에몬스 슬로건 공모전 안내', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741183&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:00.500311'],
-# ['일반공지', '[일반공지] 인공지능 학습용 데이터 온라인 해커톤 공모전 안내', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741180&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:01.281635'],
-# ['일반공지', '[일반공지] 2021학년도 2학기 학생증 신규발급 일시중단 안내(2022....', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741159&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:02.063466'],
-# ['일반공지', '[일반공지] [DUICA]컴활, GTQ, 웹퍼블리셔 자격 특강', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741146&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:02.849209'],
-# ['일반공지', '[일반공지] [중앙도서관-Making School] 메이커스페이스 MARU...', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741144&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:03.629960'],
-# ['일반공지', '[일반공지]제1회 일반교양 학생 아이디어 공모전 수상작 발표', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741143&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:04.408793'],
-# ['일반공지', '[일반공지] [카운슬링센터] 온라인 심리검사 프로그램 안내', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741128&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0','2021-12-03 19:48:05.191510'],
-# ['일반공지', '[일반공지] 2021년 동계 베트남 온라인 해외봉사 단원모집(재안내)', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741116&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:05.970713'],
-# ['일반공지','[일반공지] 2021년 동계 필리핀 온라인 해외봉사 단원모집(재안내)', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741115&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0', '2021-12-03 19:48:06.750168']
-# ]
+# new_crawl_list = ['이과대학', '제16회 이과대학 재학생 연구프로젝트 경진대회 개최 안내', 'https://math.dongguk.edu/?page_id=260/?page_id=260&pageid=1&uid=60&mod=document', '20211127193112']
+all_category = ['일반공지', '학사공지', '장학공지', '입시공지', '국제공지', '학술/행사공지']
 
 # DB 연결
 engine = create_engine(
@@ -52,49 +43,40 @@ def tokenized(new_crawl_list):
 
     kkma = Kkma()
 
-    tokenized_data = []
-    for sentence in tqdm.tqdm(new_crawl_list):
-        tokenized_sentence = kkma.nouns(sentence[1])
-        stopwords_removed_sentence = [word for word in tokenized_sentence if not word in stop_words]  # 불용어 제거
-        stopwords_removed_sentence.append(sentence[2])
-        tokenized_data.append(stopwords_removed_sentence)
+    tokenized_sentence = kkma.nouns(new_crawl_list[1])
+    tokenized_data = [word for word in tokenized_sentence if not word in stop_words]  # 불용어 제거
+    tokenized_data.append(new_crawl_list[2])
     return tokenized_data
-
+# 형식
+# ['대관', '제한', 'https://www.dongguk.edu/mbs/kr/jsp/board/view.jsp?spage=1&boardId=3646&boardSeq=26741219&id=kr_010802000000&column=&search=&categoryDepth=&mcategoryId=0']
 
 # 유사단어 찾기
 def findSimilar(new_crawl_list):
-    synonym = []
     similar_words = []
-    link = None
     tokenized_data = tokenized(new_crawl_list)
     model = Word2Vec.load('model/Kkma_dataset.model')
-    for i in tokenized_data:  # [대관, 제한, 링크]
-        link = i[-1]
-        for j in range(len(i) - 1):  # 0, 1
-            try:
-                a_synonym = model.wv.most_similar(i[j])
-                for k in a_synonym:
-                    if len(k[0]) == 1:
-                        a_synonym.remove(k)
-                a_synonym = a_synonym[:5]  # 유사단어 5개 [(유사단어1, 확률), ... , (유사단어5, 확률)]
-                a_synonym.append(i[-1])  # 링크
-                synonym.append(a_synonym)
+    link = tokenized_data[-1] # 링크
+    for j in range(len(tokenized_data) - 1):  # 링크 뺴고
+        try:
+            a_synonym = model.wv.most_similar(tokenized_data[j])
+            for k in a_synonym:
+                if len(k[0]) == 1:
+                    a_synonym.remove(k)
+            a_synonym = a_synonym[:5]  # 유사단어 5개 [(유사단어1, 확률), ... , (유사단어5, 확률)]
 
-                # 유사단어만 추출
-                if i[j] != i[-1]:
-                    similar_words.append(i[j])
+            # 유사단어만 추출
+            for i in a_synonym:
+                similar_words.append(i[0])
 
-                for h in a_synonym[:5]:
-                    similar_words.append(h[0])
-
-            except KeyError:
-                pass
+        except KeyError:
+            pass
 
     similar_words = list(set(similar_words))
     similar_words.append(link)
-    print(" >> 유사단어 추출 완료 : " + str(len(similar_words)) + " 개, " + str(similar_words))
+    # print(" >> 유사단어 추출 완료 : " + str(len(similar_words)) + " 개, " + str(similar_words))
     return similar_words
-
+# 형식
+# ['경연', '이과', '경진대회', '개별', '경연대회', '경진', '법과', '연구프로젝트', '예술대학', '교수님', '개최', '포트', '실적', '이과대학', '활용', '아이디어', '개별연구', '공과대학', '폴리오', '비교법연구등', '제권', '설계프로젝트', '프로젝트', '대회', '법과대학', '미래융합대학', '어드벤처디자인경진대회', '학술대회', 'https://math.dongguk.edu/?page_id=260/?page_id=260&pageid=1&uid=60&mod=document']
 
 # 카카오톡 발송 관련
 def send_kakao(new_crawl_list):
@@ -105,14 +87,29 @@ def send_kakao(new_crawl_list):
     users_id = []  # DB에서 조회할 사용자의 id
     temp_phone = []  # DB에서 조회할 사용자의 핸드폰번호
     users_phone = []  # DB에서 조회할 사용자의 핸드폰번호
+    users_filter = [] # users_id에 단과대와 학과까지 필터된 학생 정보
 
     for word in words_list:
-        user = session.query(Keywords.id).filter_by(key=word).all()
-        if user:
-            users_id.extend(list(user))
+        user = session.query(Keywords.id, User.college, User.department).filter_by(key= word)
+        join_user = user.join(User, Keywords.id == User.id).all()
+        if join_user:
+            users_id.extend(list(join_user))
     users_id = list(set(users_id))  # 중복 데이터 제거
+    
+    # 전체공지와 학과/단과대별 공지를 구별
+    if new_crawl_list[0] not in all_category: # all_category에 없다면
+        # if문이 성립하면 users_info에 대입
+        for data in users_id:
+            college_department = ' '.join(data[1:3]) # 이과대학 수학과
+            if new_crawl_list[0] == college_department or new_crawl_list[0] == data[1]:
+                users_filter.append(data)
+    else: # all_category에 있다면 -> 모든 유저에게 전체 발송
+        users_filter = users_id
+    # users_filter 형식
+    # [('1cb5b6d8833f9d1eb13cbebe3d60ce6bdb70559fa1bf9e1fc5bdb6fb5a426f8e30', '이과대학', '수학과'),
+    # ('25513aed053242a1f105fe1089b05aa0f60dc01ac787fe9b96f66b88f892b8ab3b', '이과대학', '통계학과')]
 
-    for key in users_id:
+    for key in users_filter:
         phone = session.query(User.phone).filter_by(id=key[0]).all()
         if phone:
             temp_phone.extend(list(phone))
@@ -121,36 +118,37 @@ def send_kakao(new_crawl_list):
     for phone in temp_phone:
         test = phone[0]
         users_phone.append(test)
+    # users_phone 형식
+    # ['01045678900', '01012345678']
 
     if len(users_phone) > 0:
-        print("카카오톡 발송 대상 있음 (" + str(len(users_phone)) + "명")
-        data = {
-            'messages': [
-                {
-                    'to': users_phone,
-                    'from': '01074477163',
-                    'text': '등록하신 키워드와 연관있는 공지가 등록되었습니다. 링크를 클릭하시면 해당 공지로 연결됩니다 :)',
-                    'kakaoOptions': {
-                        'pfId': 'KA01PF211130075802780LDxZiwnOy9H'
-                        , 'buttons': [
-                            {
-                                'buttonType': 'WL',  # 웹링크
-                                'buttonName': '공지사항 보러가기',
-                                'linkMo': link,
-                                'linkPc': link
-                            }
-                        ]
-                    }
-                }
-            ]
-        }
-        res = sendMany(data)
-        print(json.dumps(res.json(), indent=2, ensure_ascii=False))
+        print("카카오톡 발송 대상 있음 (" + str(len(users_phone)) + "명)")
+        # data = {
+        #     'messages': [
+        #         {
+        #             'to': users_phone,
+        #             'from': '01074477163',
+        #             'text': '등록하신 키워드와 연관있는 공지가 등록되었습니다. 링크를 클릭하시면 해당 공지로 연결됩니다 :)',
+        #             'kakaoOptions': {
+        #                 'pfId': 'KA01PF211130075802780LDxZiwnOy9H'
+        #                 , 'buttons': [
+        #                     {
+        #                         'buttonType': 'WL',  # 웹링크
+        #                         'buttonName': '공지사항 보러가기',
+        #                         'linkMo': link,
+        #                         'linkPc': link
+        #                     }
+        #                 ]
+        #             }
+        #         }
+        #     ]
+        # }
+        # res = sendMany(data)
+        # print(json.dumps(res.json(), indent=2, ensure_ascii=False))
     else:
         print("카카오톡 발송 대상 없음")
 
     return None
-
 
 def unique_id():
     return str(uuid.uuid1().hex)
