@@ -76,18 +76,23 @@ def certification():
     }
     return jsonify(res)
 
+
 @app.route('/department', methods=['POST'])
 def department():
     req = request.get_json()
     session = Session()
 
     id = req["userRequest"]["user"]["id"]
-    college = req["action"]["detailParams"]["college"]["value"]  # json파일 읽기
     department = req["action"]["detailParams"]["department"]["value"]
-    answer = str(id) + "\n" + college + "대학\n" + department
+    if(department=='AI융합학부'):
+        college='AI융합학부'    
+    else:
+        college = req["action"]["detailParams"]["college"]["value"]
+    answer = "학부: " + college + "\n학과: " + department + "\n로 등록되었습니다."
+    
     user = session.query(User.id).filter_by(id=id).all();
     if (user == []):
-        session.add(User(id=id, college=college, department=department))
+        session.add(User(id=id, college=college, department=department, phone=None))
         session.commit()
     else:
         conn = engine.connect()
@@ -121,15 +126,20 @@ def keywords():
     if (action == "add"):
         keyword = req["action"]["detailParams"]["keyword"]["value"]
         keys = session.query(Keywords.key).filter_by(id=id, key=keyword).all();
+        phone = session.query(User.phone).filter_by(id=id).first();
         if (keys == []):
             session.add(Keywords(id=id, key=keyword))
             session.commit()
             answer = "(" + keyword + ") 가 등록되었습니다."
         else:
-            answer = "이미 등록된 키워드입니다."
+            answer = "이미 등록된 키워드입니다."      
+        if(phone[0] == None):
+            answer += "\n아직 전화번호가 등록되지 않으셨습니다. 알림을 받으시려면 '인증'을 입력하셔서 인증해주세요."
     elif (action == "show"):
         keys = session.query(Keywords.key).filter_by(id=id).all();
-        answer = str(keys)
+        answer = ''
+        for i in keys:
+            answer += '(' + i[0] + ') '
     elif (action == "delete"):
         keyword = req["action"]["detailParams"]["keyword"]["value"]
         keys = session.query(Keywords).filter_by(id=id, key=keyword).first();
@@ -139,7 +149,6 @@ def keywords():
             session.delete(keys)
             session.commit()
             answer = "(" + keyword + ") 가 삭제되었습니다."
-
     session.close()
     res = {
         "version": "2.0",
@@ -154,38 +163,6 @@ def keywords():
         }
     }
     return jsonify(res)
-
-
-""" 한번에 알림줄때 쓰려했던 것
-@app.route('/notify')#, methods=['POST'])
-def notify():
-    session = Session()
-    #req = request.get_json()
-    #id = req["userRequest"]["user"]["id"]
-    #keyword = req["action"]["detailParams"]["keyword"]["value"]
-    id = '25513aed053242a1f105fe1089b05aa0f60dc01ac787fe9b96f66b88f892b8ab3b'
-    keyword = '수강신청'
-    keys = session.query(Keywords.key).filter_by(id=id, key=keyword).first();
-    user = session.query(User.college, User.department).filter_by(id=id).first();
-    if (user == None):
-        answer = "유저 정보를 등록하시고 다시 요청해주세요."
-    elif (keys == None):
-        answer = "등록되지 않은 키워드입니다."
-        return answer
-    else :
-        time = session.query(Keywords.notified_time).filter_by(id=id, key=keyword).first();
-        if (time == None):
-            time = '0'
-        print(time)
-        conn = engine.connect()
-        stmt = update(Keywords).where(Keywords.id == id, Keywords.key == keys[0]).values(notified_time=datetime.datetime.now())
-        conn.execute(stmt)
-        conn.close()
-        answer = findLink('dataset.model', keys[0], user[0], user[1])
-        return answer
-    
-    #return jsonify(res)
-"""
 
 
 @app.route('/test', methods=['POST'])
@@ -542,5 +519,5 @@ def crawl():
     return "크롤링 페이지"
 
 
-if __name__ == '__main__':
-    app.run('0.0.0.0', port=3000, debug=True)
+#if __name__ == '__main__':
+#    app.run('0.0.0.0', port=3000, debug=True)

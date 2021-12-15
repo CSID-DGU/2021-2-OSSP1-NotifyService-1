@@ -3,7 +3,6 @@ Flask-JSON==0.3.2
 Flask==0.12.1
 gunicorn==19.6.0
 Jinja2==2.10
-six==1.9.0
 Werkzeug==0.13
 
 beautifulsoup4==4.6.0
@@ -18,6 +17,7 @@ greenlet==1.1.2
 idna==3.3
 itsdangerous==2.0.1
 joblib==1.1.0
+JPype1==1.3.0
 # JPype1은 git에 올린 파일로 설치해주세요. (python 버전 주의)
 # python -m pip install [JPype1 파일명]
 # requirements.txt로 한 번에 패키지 설치할 때는 주석 지우고 설치해주세요.
