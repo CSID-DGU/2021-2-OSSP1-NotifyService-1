@@ -16,7 +16,7 @@ from models import User, Keywords
 from pprint import pprint
 
 #### new_crawl_list :
-new_crawl_list = ['이과대학', '제16회 이과대학 재학생 연구프로젝트 경진대회 개최 안내', 'https://math.dongguk.edu/?page_id=260/?page_id=260&pageid=1&uid=60&mod=document', '20211127193112']
+# new_crawl_list = ['이과대학', '제16회 이과대학 재학생 연구프로젝트 경진대회 개최 안내', 'https://math.dongguk.edu/?page_id=260/?page_id=260&pageid=1&uid=60&mod=document', '20211127193112']
 all_category = ['일반공지', '학사공지', '장학공지', '입시공지', '국제공지', '학술/행사공지']
 
 # DB 연결
@@ -185,5 +185,3 @@ def getUrl(path):
 
 def sendMany(data):
     return requests.post(getUrl('/messages/v4/send-many'), headers=get_headers(apiKey, apiSecret), json=data)
-
-send_kakao(new_crawl_list)
