@@ -138,7 +138,7 @@ def keywords():
     elif (action == "show"):
         keys = session.query(Keywords.key).filter_by(id=id).all();
         answer = ''
-        if keys is None:
+        if (keys == []):
             answer += "등록된 키워드가 없습니다."
         else:
             answer += "[등록된 키워드]"
@@ -479,11 +479,12 @@ def crawl():
                         new_crawl_list[new_crawl_count].append(name.replace("\xa0", " "))
                         new_crawl_list[new_crawl_count].append(link)
                         new_crawl_list[new_crawl_count].append(now_time)
-                        new_crawl_count += 1
 
                         # 유사 단어 찾아서 알림 발송하기
                         #findSimilar(new_crawl_list)
-                        send_kakao(new_crawl_list)
+                        send_kakao(new_crawl_list[new_crawl_count])
+
+                        new_crawl_count += 1
                     else:
                         print('     실패 : [' + category + ']' + name + ' >> ' + link)
 
