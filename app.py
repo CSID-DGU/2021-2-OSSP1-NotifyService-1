@@ -88,7 +88,7 @@ def department():
         college='AI융합학부'    
     else:
         college = req["action"]["detailParams"]["college"]["value"]
-    answer = college + ", " + department + "\n로 등록되었습니다."
+    answer = "[등록 완료]\n" + college + ", " + department + ""
     
     user = session.query(User.id).filter_by(id=id).all();
     if (user == []):
@@ -130,7 +130,7 @@ def keywords():
         if (keys == []):
             session.add(Keywords(id=id, key=keyword))
             session.commit()
-            answer = "[" + keyword + "] 가 등록되었습니다."
+            answer = "[등록 완료]\n" + keyword
         else:
             answer = "이미 등록된 키워드입니다."      
         if(phone[0] == None):
