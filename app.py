@@ -88,7 +88,7 @@ def department():
         college='AI융합학부'    
     else:
         college = req["action"]["detailParams"]["college"]["value"]
-    answer = "학부: " + college + "\n학과: " + department + "\n로 등록되었습니다."
+    answer = college + ", " + department + "\n로 등록되었습니다."
     
     user = session.query(User.id).filter_by(id=id).all();
     if (user == []):
@@ -130,16 +130,20 @@ def keywords():
         if (keys == []):
             session.add(Keywords(id=id, key=keyword))
             session.commit()
-            answer = "(" + keyword + ") 가 등록되었습니다."
+            answer = "[" + keyword + "] 가 등록되었습니다."
         else:
             answer = "이미 등록된 키워드입니다."      
         if(phone[0] == None):
-            answer += "\n아직 전화번호가 등록되지 않으셨습니다. 알림을 받으시려면 '인증'을 입력하셔서 인증해주세요."
+            answer += "\n\n 키워드 알림을 받으시려면 개인정보 제공에 동의해주셔야 합니다. 알림을 받으시려면 '인증'을 입력해주세요."
     elif (action == "show"):
         keys = session.query(Keywords.key).filter_by(id=id).all();
         answer = ''
-        for i in keys:
-            answer += '(' + i[0] + ') '
+        if keys is None:
+            answer += "등록된 키워드가 없습니다."
+        else:
+            answer += "[등록된 키워드]"
+            for i in keys:
+                answer += '\n' + (i+1) + '. ' + i[0]
     elif (action == "delete"):
         keyword = req["action"]["detailParams"]["keyword"]["value"]
         keys = session.query(Keywords).filter_by(id=id, key=keyword).first();
@@ -519,5 +523,5 @@ def crawl():
     return "크롤링 페이지"
 
 
-#if __name__ == '__main__':
-#    app.run('0.0.0.0', port=3000, debug=True)
+if __name__ == '__main__':
+   app.run('0.0.0.0', port=3000, debug=True)
