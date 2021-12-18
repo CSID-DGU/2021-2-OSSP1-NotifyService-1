@@ -142,8 +142,10 @@ def keywords():
             answer += "등록된 키워드가 없습니다."
         else:
             answer += "[등록된 키워드]"
+            index = 1
             for i in keys:
-                answer += '\n' + (i+1) + '. ' + i[0]
+                answer += '\n' + str(index) + '. ' + i[0]
+                index += 1
     elif (action == "delete"):
         keyword = req["action"]["detailParams"]["keyword"]["value"]
         keys = session.query(Keywords).filter_by(id=id, key=keyword).first();
